@@ -123,8 +123,8 @@ length })`. 본 라이브러리의 `nanoid(length)`는 alphabet 인자가 없다
     4. cuid2·seedrandom `{entropy:true}`처럼 CSPRNG 부재 시 자동 폴백하는 라이브러리에서 옮길 때: 본
        라이브러리는 폴백하지 않고 `SecureRandomUnavailableError`를 던진다. `getCryptoCapabilities()`로 먼저
        확인한다.
-  - §3 채택하지 않은 패턴. 표 `패턴 | 출처 | 채택하지 않은 이유` 7행(§3 분류표의 "기각" 항목). 이유는 각
-    1문장.
+  - §3 채택하지 않은 패턴. 표 `패턴 | 출처 | 채택하지 않은 이유` 9행(§3 분류표의 "기각" 7건 + nanoid
+    비트마스크 경로 + pure-rand의 다축 breaking 릴리스). 이유는 각 1문장.
 - 완료 기준: 표의 근거 열이 인용한 절이 상세 문서에 존재한다. README 두 곳에서 링크가 도달한다.
   `pnpm format:check`, `pnpm check:pack`(패키지 README 변경 반영) 통과.
 
