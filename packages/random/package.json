@@ -55,12 +55,14 @@
   "scripts": {
     "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc",
     "lint": "eslint . --max-warnings 0",
-    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit"
+    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit",
+    "release": "release-it"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "eslint": "10.11.0",
+    "release-it": "^21.1.0",
     "typescript": "6.0.3"
   }
 }
