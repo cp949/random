@@ -1,0 +1,66 @@
+{
+  "name": "@cp949/random",
+  "version": "0.1.0",
+  "description": "브라우저용 ID 생성기와 그 토대인 보안·재현 가능 난수 라이브러리",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cp949/random.git",
+    "directory": "packages/random"
+  },
+  "homepage": "https://github.com/cp949/random#readme",
+  "bugs": {
+    "url": "https://github.com/cp949/random/issues"
+  },
+  "keywords": [
+    "random",
+    "prng",
+    "xoshiro128",
+    "seed",
+    "uuid",
+    "nanoid",
+    "secure-random",
+    "browser",
+    "esm",
+    "id",
+    "id-generator",
+    "uuidv7"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./secure": {
+      "types": "./dist/secure/index.d.ts",
+      "default": "./dist/secure/index.js"
+    },
+    "./id": {
+      "types": "./dist/id/index.d.ts",
+      "default": "./dist/id/index.js"
+    },
+    "./state": {
+      "types": "./dist/state/index.d.ts",
+      "default": "./dist/state/index.js"
+    }
+  },
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc",
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit && tsc -p tsconfig.test.json --noEmit"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "eslint": "10.11.0",
+    "typescript": "6.0.3"
+  }
+}

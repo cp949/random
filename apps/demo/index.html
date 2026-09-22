@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@cp949/random demo</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 640px;
+        margin: 2rem auto;
+      }
+      section {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      pre {
+        background: #f5f5f5;
+        padding: 0.5rem;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <h1>@cp949/random demo</h1>
+
+      <section id="section-root">
+        <h2>root — 재현 가능한 PRNG</h2>
+        <label>seed <input id="root-seed" type="text" value="42" /></label>
+        <button id="root-run" type="button">실행</button>
+        <pre id="root-out"></pre>
+      </section>
+
+      <section id="section-state">
+        <h2>./state — 상태 facade</h2>
+        <button id="state-roll" type="button">rand.int(1, 6) 굴리기</button>
+        <pre id="state-roll-out"></pre>
+        <pre id="state-check-out"></pre>
+      </section>
+
+      <section id="section-secure">
+        <h2>./secure — 보안 난수</h2>
+        <button id="secure-hex" type="button">randomHex(16)</button>
+        <button id="secure-base64url" type="button">randomBase64url(16)</button>
+        <button id="secure-int" type="button">randomInt(1, 100)</button>
+        <pre id="secure-out"></pre>
+      </section>
+
+      <section id="section-id">
+        <h2>./id — ID·UUID</h2>
+        <button id="id-uuidv4" type="button">uuidv4()</button>
+        <button id="id-uuidv7" type="button">uuidv7()</button>
+        <button id="id-nanoid" type="button">nanoid()</button>
+        <button id="id-randomid" type="button">randomId({ prefix: "req" })</button>
+        <button id="id-cyclic" type="button">순환 ID 3회</button>
+        <pre id="id-out"></pre>
+      </section>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

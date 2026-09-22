@@ -1,0 +1,49 @@
+{
+  "name": "random",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint && pnpm lint:scripts",
+    "lint:scripts": "eslint scripts --max-warnings 0",
+    "format": "prettier --write \"**/*.{ts,tsx,mjs,json,md,yml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,mjs,json,md,yml}\"",
+    "check-types": "turbo run check-types",
+    "test": "vitest run",
+    "check:no-dom": "node scripts/check-no-dom.mjs",
+    "check:baseline": "node scripts/check-baseline.mjs",
+    "check:consumer": "node scripts/check-consumer.mjs",
+    "check:deps": "node scripts/check-deps.mjs",
+    "check:pack": "node scripts/check-pack.mjs",
+    "check:size-config": "node scripts/check-size-config.mjs",
+    "check:escompat": "node scripts/check-escompat.mjs",
+    "check:root-isolation": "node scripts/check-root-isolation.mjs",
+    "size": "node scripts/size.mjs",
+    "smoke:legacy-browser": "node packages/legacy-browser-smoke/src/run.mjs --target container",
+    "smoke:local-browser": "node packages/legacy-browser-smoke/src/run.mjs --target local",
+    "mutation": "pnpm --filter @cp949/random exec stryker run",
+    "verify": "pnpm lint && pnpm format:check && pnpm build --force && pnpm check:escompat && pnpm check:root-isolation && pnpm check:baseline && pnpm check:deps && pnpm check:no-dom && pnpm check-types && pnpm test && pnpm check:size-config && pnpm size && pnpm check:pack && pnpm check:consumer"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@size-limit/preset-small-lib": "14.0.0",
+    "@stryker-mutator/core": "10.0.0",
+    "@stryker-mutator/vitest-runner": "10.0.0",
+    "@types/node": "24.13.6",
+    "eslint": "10.11.0",
+    "eslint-plugin-es-x": "9.7.0",
+    "prettier": "3.9.8",
+    "publint": "0.3.24",
+    "size-limit": "14.0.0",
+    "turbo": "^2.11.2",
+    "typescript": "6.0.3",
+    "typescript-5.7": "npm:typescript@5.7.3",
+    "vite": "8.3.0",
+    "vitest": "5.0.1"
+  },
+  "packageManager": "pnpm@11.27.0",
+  "engines": {
+    "node": ">=24"
+  }
+}

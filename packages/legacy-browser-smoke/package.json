@@ -1,0 +1,15 @@
+{
+  "name": "@cp949/legacy-browser-smoke",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "eslint": "10.11.0",
+    "eslint-plugin-es-x": "9.7.0",
+    "globals": "17.12.0"
+  }
+}

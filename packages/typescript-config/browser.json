@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    // Chrome 75 하한: `?.`/`??`는 Chrome 80+ 이므로 다운레벨링하고,
+    // lib을 ES2019로 제한해 Chrome 75에 없는 API 사용을 컴파일 단계에서 차단한다.
+    "target": "ES2019",
+    "lib": ["ES2019", "DOM", "DOM.Iterable"]
+  }
+}

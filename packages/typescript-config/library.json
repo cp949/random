@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    // Chrome 75 하한 라이브러리용: lib을 ES2019 하나로 제한하고 전역 타입 패키지를 끌어오지 않는다.
+    // DOM·Node 전역이나 ES2019 이후 API를 쓰면 컴파일 단계에서 실패한다.
+    "target": "ES2019",
+    "lib": ["ES2019"],
+    "types": [],
+    // .d.ts.map은 src를 가리키는데 배포물(files)에 src가 없어 끊어진 참조가 되므로 끈다.
+    "declarationMap": false
+  }
+}

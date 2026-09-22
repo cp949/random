@@ -1,0 +1,230 @@
+[
+  {
+    "name": "randomBytes",
+    "path": "dist/secure/index.js",
+    "import": "{ randomBytes }",
+    "limit": "550 B"
+  },
+  {
+    "name": "getCryptoCapabilities",
+    "path": "dist/secure/index.js",
+    "import": "{ getCryptoCapabilities }",
+    "limit": "250 B"
+  },
+  {
+    "name": "SecureRandomUnavailableError",
+    "path": "dist/secure/index.js",
+    "import": "{ SecureRandomUnavailableError }",
+    "limit": "150 B"
+  },
+  {
+    "name": "randomInt",
+    "path": "dist/secure/index.js",
+    "import": "{ randomInt }",
+    "limit": "900 B"
+  },
+  {
+    "name": "randomHex",
+    "path": "dist/secure/index.js",
+    "import": "{ randomHex }",
+    "limit": "600 B"
+  },
+  {
+    "name": "randomBase64url",
+    "path": "dist/secure/index.js",
+    "import": "{ randomBase64url }",
+    "limit": "800 B"
+  },
+  {
+    "name": "randomString",
+    "path": "dist/secure/index.js",
+    "import": "{ randomString }",
+    "limit": "950 B"
+  },
+  {
+    "name": "createSecureSource",
+    "path": "dist/secure/index.js",
+    "import": "{ createSecureSource }",
+    "limit": "500 B"
+  },
+  {
+    "name": "randomId",
+    "path": "dist/id/index.js",
+    "import": "{ randomId }",
+    "limit": "3200 B"
+  },
+  {
+    "name": "createRandomIdFactory",
+    "path": "dist/id/index.js",
+    "import": "{ createRandomIdFactory }",
+    "limit": "3400 B"
+  },
+  {
+    "name": "nanoid",
+    "path": "dist/id/index.js",
+    "import": "{ nanoid }",
+    "limit": "700 B"
+  },
+  {
+    "name": "SecureRandomUnavailableError (id)",
+    "path": "dist/id/index.js",
+    "import": "{ SecureRandomUnavailableError }",
+    "limit": "150 B"
+  },
+  {
+    "name": "IdCollisionError",
+    "path": "dist/id/index.js",
+    "import": "{ IdCollisionError }",
+    "limit": "150 B"
+  },
+  {
+    "name": "isUuid",
+    "path": "dist/id/index.js",
+    "import": "{ isUuid }",
+    "limit": "750 B"
+  },
+  {
+    "name": "parseUuid",
+    "path": "dist/id/index.js",
+    "import": "{ parseUuid }",
+    "limit": "400 B"
+  },
+  {
+    "name": "stringifyUuid",
+    "path": "dist/id/index.js",
+    "import": "{ stringifyUuid }",
+    "limit": "800 B"
+  },
+  {
+    "name": "uuidv4",
+    "path": "dist/id/index.js",
+    "import": "{ uuidv4 }",
+    "limit": "950 B"
+  },
+  {
+    "name": "createUuidv4Factory",
+    "path": "dist/id/index.js",
+    "import": "{ createUuidv4Factory }",
+    "limit": "1200 B"
+  },
+  {
+    "name": "uuidv7",
+    "path": "dist/id/index.js",
+    "import": "{ uuidv7 }",
+    "limit": "1450 B"
+  },
+  {
+    "name": "createUuidv7Factory",
+    "path": "dist/id/index.js",
+    "import": "{ createUuidv7Factory }",
+    "limit": "1650 B"
+  },
+  {
+    "name": "createCyclicIdFactory",
+    "path": "dist/id/index.js",
+    "import": "{ createCyclicIdFactory }",
+    "limit": "1250 B"
+  },
+  {
+    "name": "createCounterIdFactory",
+    "path": "dist/id/index.js",
+    "import": "{ createCounterIdFactory }",
+    "limit": "1450 B"
+  },
+  {
+    "name": "createXoshiro128Source",
+    "path": "dist/index.js",
+    "import": "{ createXoshiro128Source }",
+    "limit": "600 B"
+  },
+  {
+    "name": "int",
+    "path": "dist/index.js",
+    "import": "{ int }",
+    "limit": "550 B"
+  },
+  {
+    "name": "float",
+    "path": "dist/index.js",
+    "import": "{ float }",
+    "limit": "200 B"
+  },
+  {
+    "name": "bool",
+    "path": "dist/index.js",
+    "import": "{ bool }",
+    "limit": "300 B"
+  },
+  {
+    "name": "sign",
+    "path": "dist/index.js",
+    "import": "{ sign }",
+    "limit": "150 B"
+  },
+  {
+    "name": "uniform",
+    "path": "dist/index.js",
+    "import": "{ uniform }",
+    "limit": "600 B"
+  },
+  {
+    "name": "choice",
+    "path": "dist/index.js",
+    "import": "{ choice }",
+    "limit": "400 B"
+  },
+  {
+    "name": "shuffle",
+    "path": "dist/index.js",
+    "import": "{ shuffle }",
+    "limit": "400 B"
+  },
+  {
+    "name": "shuffleInPlace",
+    "path": "dist/index.js",
+    "import": "{ shuffleInPlace }",
+    "limit": "400 B"
+  },
+  {
+    "name": "sample",
+    "path": "dist/index.js",
+    "import": "{ sample }",
+    "limit": "500 B"
+  },
+  {
+    "name": "permutation",
+    "path": "dist/index.js",
+    "import": "{ permutation }",
+    "limit": "500 B"
+  },
+  {
+    "name": "weightedChoice",
+    "path": "dist/index.js",
+    "import": "{ weightedChoice }",
+    "limit": "600 B"
+  },
+  {
+    "name": "createWeightedSampler",
+    "path": "dist/index.js",
+    "import": "{ createWeightedSampler }",
+    "limit": "700 B"
+  },
+  {
+    "name": "createRandomState",
+    "path": "dist/state/index.js",
+    "import": "{ createRandomState }",
+    "limit": "2700 B"
+  },
+  {
+    "name": "rand",
+    "path": "dist/state/index.js",
+    "import": "{ rand }",
+    "limit": "2700 B"
+  },
+  {
+    "name": "SecureRandomUnavailableError (state)",
+    "path": "dist/state/index.js",
+    "import": "{ SecureRandomUnavailableError }",
+    "limit": "150 B"
+  }
+]

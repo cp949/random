@@ -1,0 +1,10 @@
+{
+  "chromeFloor": 75,
+  "esTarget": "ES2019",
+  "chromium": {
+    "version": "75.0.3765.0",
+    "revision": 650583,
+    "platform": "Linux_x64",
+    "sha256": "10ae4e05d9f01a8b646dd2ccc2ac1135e597c472abe5be71552aae7d8a35e2ac"
+  }
+}
