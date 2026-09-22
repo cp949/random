@@ -74,6 +74,9 @@ nextId(); // 호출마다 1씩 증가, 범위 끝에서 반대쪽으로 순환
   `./secure`의 `randomHex`·`randomBase64url`을 쓴다.
 - 순환 ID(`createCyclicIdFactory`)는 다음 값을 예측할 수 있다. 공개 URL 슬러그·초대 코드에는
   맞지 않는다.
+- 테스트·시뮬레이션에서 재현 가능한 ID가 필요하면 seed 상태의 `source`를 `./id` 팩토리의
+  `randomBytes`로 감싼다([레시피](https://github.com/cp949/random/blob/main/docs/api/state.md#재현-가능한-id-statesource를-randombytes로-바꾼다)).
+  주입한 난수원으로 만든 ID에는 보안 보증이 없다.
 
 ## 문서
 

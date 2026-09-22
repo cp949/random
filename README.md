@@ -6,12 +6,12 @@
 
 공개 계약(함수별 입력 검증, 오류, 결과값이 계약인지 여부)은 `docs/api/`에 기록한다.
 
-| subpath                | 상태 | 계약 문서                                                                                            |
-| ---------------------- | ---- | ---------------------------------------------------------------------------------------------------- |
-| `@cp949/random`        | 구현 | [`docs/api/random-core.md`](docs/api/random-core.md), [`docs/api/sampling.md`](docs/api/sampling.md) |
-| `@cp949/random/state`  | 구현 | [`docs/api/state.md`](docs/api/state.md)                                                             |
-| `@cp949/random/secure` | 구현 | [`docs/api/secure.md`](docs/api/secure.md)                                                           |
-| `@cp949/random/id`     | 구현 | [`docs/api/id.md`](docs/api/id.md), [사용처별 레시피](docs/guides/id-recipes.md)                     |
+| subpath                | 상태 | 계약 문서                                                                                                                              |
+| ---------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `@cp949/random`        | 구현 | [`docs/api/random-core.md`](docs/api/random-core.md), [`docs/api/sampling.md`](docs/api/sampling.md)                                   |
+| `@cp949/random/state`  | 구현 | [`docs/api/state.md`](docs/api/state.md), [재현 가능한 ID 레시피](docs/api/state.md#재현-가능한-id-statesource를-randombytes로-바꾼다) |
+| `@cp949/random/secure` | 구현 | [`docs/api/secure.md`](docs/api/secure.md)                                                                                             |
+| `@cp949/random/id`     | 구현 | [`docs/api/id.md`](docs/api/id.md), [사용처별 레시피](docs/guides/id-recipes.md)                                                       |
 
 유사 라이브러리와의 차이와 옮겨올 때 걸리는 점은 [`docs/comparison.md`](docs/comparison.md)에 있다.
 
