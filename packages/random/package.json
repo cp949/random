@@ -1,6 +1,6 @@
 {
   "name": "@cp949/random",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "브라우저용 ID 생성기와 그 토대인 보안·재현 가능 난수 라이브러리",
   "license": "MIT",
   "type": "module",
