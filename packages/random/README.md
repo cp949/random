@@ -19,12 +19,12 @@ pnpm add @cp949/random
 
 ## subpath
 
-| subpath    | 용도                                    | 난수원 요건                                                |
-| ---------- | --------------------------------------- | ---------------------------------------------------------- |
-| `.`        | 재현 가능한 PRNG(xoshiro128**), 샘플링  | 없음(seed 또는 주입한 source로 동작)                       |
+| subpath    | 용도                                    | 난수원 요건                                                                                                                   |
+| ---------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `.`        | 재현 가능한 PRNG(xoshiro128**), 샘플링  | 없음(seed 또는 주입한 source로 동작)                                                                                          |
 | `./state`  | `.`의 함수를 바인딩한 상태 객체, `rand` | seed 없는 상태·`rand`는 첫 사용 시 `getRandomValues`로 초기화만 한다(lazy). 이후 출력은 비보안 PRNG — 아래 "예측 가능성" 참고 |
-| `./secure` | 보안 난수(bytes, hex, base64url, int)   | `globalThis.crypto.getRandomValues`                        |
-| `./id`     | UUID, nanoid, 순환/카운터 ID            | `getRandomValues`(대부분), `Date.now`(uuidv7 계열)         |
+| `./secure` | 보안 난수(bytes, hex, base64url, int)   | `globalThis.crypto.getRandomValues`                                                                                           |
+| `./id`     | UUID, nanoid, 순환/카운터 ID            | `getRandomValues`(대부분), `Date.now`(uuidv7 계열)                                                                            |
 
 ## 예제
 
@@ -140,12 +140,12 @@ root(`.`)와 `./state`는 반대다. xoshiro128\*\*(비암호 PRNG)로 값을 �
 그 무작위 부분의 엔트로피가 충분하면 전체 값은 여전히 추측 불가능하다 — 자물쇠에 눈에 보이는
 제조사 각인이 있어도 비밀번호 자체는 못 맞추는 것과 같다.
 
-| 함수                                               | 다음 값·다른 사용자의 값을 추측할 수 있는가                                                                                     |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `nanoid`, `uuidv4`, `randomId`(`timestamp` 옵션 포함) | 아니오. 무작위 부분 전체가 `getRandomValues` 직결이며, `timestamp: true`를 켜도 무작위 부분의 길이·엔트로피는 그대로다             |
-| `uuidv7`                                            | 부분적으로 예. counter 12비트는 같은 밀리초의 첫 값만 난수이고 이후 `+1`로 순차 증가해, 같은 밀리초 안의 다음 값을 좁혀 추측할 수 있다 |
-| `createCyclicIdFactory`, `createCounterIdFactory`   | 예. crypto를 쓰지 않는 등차수열이라 다음 값이 완전히 결정된다                                                                      |
-| `randomBytes`·`now`를 주입한 팩토리의 결과          | 보증 없음. 주입값이 곧 결과를 결정하므로 테스트 전용이며 운영 코드에서는 넘기지 않는다                                             |
+| 함수                                                  | 다음 값·다른 사용자의 값을 추측할 수 있는가                                                                                            |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `nanoid`, `uuidv4`, `randomId`(`timestamp` 옵션 포함) | 아니오. 무작위 부분 전체가 `getRandomValues` 직결이며, `timestamp: true`를 켜도 무작위 부분의 길이·엔트로피는 그대로다                 |
+| `uuidv7`                                              | 부분적으로 예. counter 12비트는 같은 밀리초의 첫 값만 난수이고 이후 `+1`로 순차 증가해, 같은 밀리초 안의 다음 값을 좁혀 추측할 수 있다 |
+| `createCyclicIdFactory`, `createCounterIdFactory`     | 예. crypto를 쓰지 않는 등차수열이라 다음 값이 완전히 결정된다                                                                          |
+| `randomBytes`·`now`를 주입한 팩토리의 결과            | 보증 없음. 주입값이 곧 결과를 결정하므로 테스트 전용이며 운영 코드에서는 넘기지 않는다                                                 |
 
 값 추측 가능성과 별개로, **생성 시각이 드러나는가**의 문제도 있다. `uuidv7`과
 `randomId({ timestamp: true })`는 접두사에 `Date.now()`를 그대로 인코딩하므로 값을 추측할 수
@@ -157,14 +157,14 @@ UUID는 형식이 정해진 식별자일 뿐 인가 수단이 아니다. 값을 
 
 ### 용도별 선택
 
-| 용도                                      | 피할 것                                           | 쓸 것                                                       |
-| ----------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------ |
-| 인증 토큰·세션 ID·비밀번호 재설정 링크    | `rand`·seed 있는 PRNG(추측 가능해서), UUID(추측은 어려워도 식별자일 뿐 비밀값이 아니라서) | `./secure`의 `randomHex`·`randomBase64url`·`randomInt`       |
-| 추측 불가해야 하는 공개 슬러그·초대 코드  | `createCyclicIdFactory`·`createCounterIdFactory`   | `randomId`, `./secure`의 `randomBase64url`                   |
-| 생성 시각을 감춰야 하는 DB PK              | `uuidv7`, `randomId({ timestamp: true })`(둘 다 접두사가 시각) | `uuidv4`, timestamp 없는 `randomId`                |
-| 정렬 가능한 DB PK(시각 노출 허용)          | -                                                   | `uuidv7`                                                      |
-| 테스트·시뮬레이션(재현 필요)               | `./secure`, `./id`의 기본 난수원                   | seed 있는 `.`/`./state`, 또는 주입한 `source`·`randomBytes`   |
-| 주사위·셔플 등 보안과 무관한 일반 난수     | -                                                   | `./state`의 `rand`                                            |
+| 용도                                     | 피할 것                                                                                   | 쓸 것                                                       |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| 인증 토큰·세션 ID·비밀번호 재설정 링크   | `rand`·seed 있는 PRNG(추측 가능해서), UUID(추측은 어려워도 식별자일 뿐 비밀값이 아니라서) | `./secure`의 `randomHex`·`randomBase64url`·`randomInt`      |
+| 추측 불가해야 하는 공개 슬러그·초대 코드 | `createCyclicIdFactory`·`createCounterIdFactory`                                          | `randomId`, `./secure`의 `randomBase64url`                  |
+| 생성 시각을 감춰야 하는 DB PK            | `uuidv7`, `randomId({ timestamp: true })`(둘 다 접두사가 시각)                            | `uuidv4`, timestamp 없는 `randomId`                         |
+| 정렬 가능한 DB PK(시각 노출 허용)        | -                                                                                         | `uuidv7`                                                    |
+| 테스트·시뮬레이션(재현 필요)             | `./secure`, `./id`의 기본 난수원                                                          | seed 있는 `.`/`./state`, 또는 주입한 `source`·`randomBytes` |
+| 주사위·셔플 등 보안과 무관한 일반 난수   | -                                                                                         | `./state`의 `rand`                                          |
 
 테스트·시뮬레이션에서 재현 가능한 ID가 필요하면 seed 상태의 `source`를 `./id` 팩토리의
 `randomBytes`로 감싼다([레시피](https://github.com/cp949/random/blob/main/docs/api/state.md#재현-가능한-id-statesource를-randombytes로-바꾼다)).

@@ -59,7 +59,7 @@ const fileId = uuidv4({ dashes: false });
 
 결과는 version·variant가 들어 있는 소문자 hex 32자다. 애플리케이션이 허용한 확장자를 붙여 `fileId + ".png"`처럼 저장 이름을 구성할 수 있다. 이 호출은 파일을 생성하거나 이름을 예약하지 않는다. 실제 파일 생성 시 기존 파일을 덮어쓰지 않는 저장소 연산으로 충돌을 처리한다.
 
-## HTML id
+## HTML id · CSS 클래스/ID · XML Name
 
 ```ts
 import { randomId } from "@cp949/random/id";
@@ -67,7 +67,25 @@ import { randomId } from "@cp949/random/id";
 const elementId = randomId({ startWithLetter: true, length: 10 });
 ```
 
-첫 글자는 ASCII 영문자이며 나머지 9자는 base64url 문자다. `length`는 첫 글자를 포함한 무작위 부분의 길이다. 문서 안의 유일성은 자동 보장하지 않으므로 같은 페이지에 삽입하는 애플리케이션이 중복을 처리한다. 다른 옵션으로 사용자 문자 집합이나 접두사를 허용하면 HTML/CSS 문맥에 맞는 처리를 별도로 한다.
+첫 글자는 ASCII 영문자이며 나머지 9자는 base64url 문자다. `length`는 첫 글자를 포함한 무작위 부분의 길이다. 문서 안의 유일성은 자동 보장하지 않으므로 같은 페이지에 삽입하는 애플리케이션이 중복을 처리한다.
+
+숫자로 시작하지 않는 이 형식은 다음 문맥에 이스케이프 없이 그대로 쓸 수 있다.
+
+- HTML `id` 속성: 공백 없는 비어 있지 않은 문자열이면 되므로 무조건 만족한다.
+- CSS 클래스 선택자(`.${elementId}`)·ID 선택자(`#${elementId}`): CSS `<ident-token>` 문법(숫자로 시작 불가, 나머지는 영숫자·`-`·`_`)을 만족해 이스케이프(`\3` 표기)가 필요 없다.
+- XML/HTML Name(요소·속성 이름, NCName): `:`을 포함하지 않고 숫자로 시작하지 않으므로 그대로 쓸 수 있다.
+
+### XML/HTML 속성값·텍스트 콘텐츠
+
+속성 *이름*이 아니라 속성 *값*이나 텍스트 콘텐츠로만 쓰면 `startWithLetter` 없이 아무 preset이나 안전하다. 이스케이프 대상은 `<`, `&`, 따옴표(`"`, `'`)인데 base64url·base62·base36·digits·readable 문자 집합 모두 이 문자들을 포함하지 않는다.
+
+```ts
+const token = randomId({ preset: "base62", length: 16 });
+element.setAttribute("data-token", token);
+element.textContent = token;
+```
+
+`setAttribute`·`textContent =` 같은 DOM API가 이스케이프를 대신하므로 직접 마크업 문자열을 이어붙이지 않는다. 다른 사용자 입력과 섞어 마크업 문자열을 직접 조립하는 코드에는 이 보장이 적용되지 않는다.
 
 ## 인증 코드
 
