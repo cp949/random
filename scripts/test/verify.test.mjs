@@ -19,6 +19,7 @@ const MANUAL = new Set([
   "verify",
   "smoke:legacy-browser",
   "smoke:local-browser",
+  "release-it",
 ]);
 
 describe("pnpm verify", () => {

@@ -23,6 +23,7 @@
     "smoke:legacy-browser": "node packages/legacy-browser-smoke/src/run.mjs --target container",
     "smoke:local-browser": "node packages/legacy-browser-smoke/src/run.mjs --target local",
     "mutation": "pnpm --filter @cp949/random exec stryker run",
+    "release-it": "pnpm --filter @cp949/random exec release-it",
     "verify": "pnpm lint && pnpm format:check && pnpm build --force && pnpm check:escompat && pnpm check:root-isolation && pnpm check:baseline && pnpm check:deps && pnpm check:no-dom && pnpm check-types && pnpm test && pnpm check:size-config && pnpm size && pnpm check:pack && pnpm check:consumer"
   },
   "devDependencies": {
