@@ -3,10 +3,12 @@ import assert from "node:assert/strict";
 import {
   createCounterIdFactory,
   createCyclicIdFactory,
+  nanoid,
   randomId,
   uuidv4,
 } from "@cp949/random/id";
 
+assert.match(nanoid(), /^[A-Za-z0-9_-]{21}$/);
 assert.match(
   randomId({ prefix: "usr", length: 16 }),
   /^usr_[A-Za-z0-9_-]{16}$/,

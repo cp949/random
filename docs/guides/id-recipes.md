@@ -2,7 +2,20 @@
 
 `@cp949/random/id`의 공개 API를 그대로 호출하는 예시다. 기본 난수원은 `crypto.getRandomValues`이며, 주입 난수원의 결과에는 보안 보증이 없다. 상세 옵션·오류·결과값 계약은 [ID API 계약](../api/id.md)을 따른다.
 
-아래 생성식 9개는 `fixtures/consumer/recipes-id.mjs`가 tarball 설치본에서 실행하며, 같은 식을 `usage-id.ts`가 TypeScript 5.7.3·저장소 TypeScript의 NodeNext·Bundler 설정에서 검사한다. 정규식은 결과 형식을 검증한다. Chrome 75 실브라우저, DB 저장, 파일 생성, DOM 삽입, 인증 서비스 통합을 실행한 증거는 아니다.
+아래 생성식 10개는 `fixtures/consumer/recipes-id.mjs`가 tarball 설치본에서 실행하며, 같은 식을 `usage-id.ts`가 TypeScript 5.7.3·저장소 TypeScript의 NodeNext·Bundler 설정에서 검사한다. 정규식은 결과 형식을 검증한다. Chrome 75 실브라우저, DB 저장, 파일 생성, DOM 삽입, 인증 서비스 통합을 실행한 증거는 아니다.
+
+## 범용 무작위 ID
+
+```ts
+import { nanoid } from "@cp949/random/id";
+
+const id = nanoid(); // 21자 base64url, 예: "V1StGXR8_Z5jdHi6B-myT"
+```
+
+접두사·시각·충돌 검사 같은 조합이 필요 없을 때 가장 단순한 선택이다. 기본 21자(126비트)는 UUID
+v4(122비트)와 비슷한 충돌 확률을 낸다. `nanoid(12)`처럼 길이만 바꿀 수 있고, 문자 집합
+(`A-Za-z0-9-_`)과 난수원은 고정이다. 접두사·시각·그룹·다른 문자 집합이 필요하면 아래 `randomId`
+레시피를 쓴다.
 
 ## 요청 ID
 
