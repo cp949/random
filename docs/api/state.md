@@ -205,6 +205,44 @@ const { int, choice } = rand;
 const testState = createRandomState("test-seed");
 ```
 
+### 재현 가능한 ID: `state.source`를 `randomBytes`로 바꾼다
+
+`./id`의 무작위 팩토리(`createUuidv4Factory`, `createUuidv7Factory`, `createRandomIdFactory`)는 `randomBytes: (length) => Uint8Array`를 주입받는다. seed 상태의 `source`(32비트 word)를 바이트 함수로 감싸면 같은 seed에서 같은 ID가 나온다. 테스트 fixture와 시뮬레이션용이다.
+
+```ts
+import type { RandomSource } from "@cp949/random";
+import { createRandomState } from "@cp949/random/state";
+import { createRandomIdFactory, createUuidv4Factory } from "@cp949/random/id";
+
+// word 하나를 4바이트(하위 바이트부터)로 펼친다. 길이가 4의 배수가 아니면 마지막 word의 일부만 쓴다.
+function toByteSource(source: RandomSource): (length: number) => Uint8Array {
+  return (length) => {
+    const bytes = new Uint8Array(length);
+    for (let i = 0; i < length; i += 4) {
+      const word = source();
+      for (let j = 0; j < 4 && i + j < length; j += 1) {
+        bytes[i + j] = (word >>> (8 * j)) & 0xff;
+      }
+    }
+    return bytes;
+  };
+}
+
+const state = createRandomState("fixture-seed");
+const randomBytes = toByteSource(state.source);
+
+const uuid = createUuidv4Factory({ randomBytes });
+const id = createRandomIdFactory({ preset: "base62", length: 12, randomBytes });
+
+uuid(); // 같은 seed·같은 호출 순서면 같은 값
+id();
+```
+
+- 두 팩토리가 `state.source` 하나를 공유하므로 호출 순서가 바뀌면 값도 바뀐다. 팩토리마다 독립된 재현이 필요하면 `createRandomState(seed)`를 따로 만든다.
+- `createUuidv7Factory`는 시계도 결과에 들어가므로 `now`까지 주입해야 재현된다.
+- 값 자체, word→byte 매핑, 소비 순서는 계약이 아니다(`docs/api/id.md` "보장 범위"). 스냅샷으로 고정하지 않는다.
+- 주입한 난수원으로 만든 ID에는 보안 보증이 없다. 운영 코드의 ID는 주입 없이 `uuidv4()`·`randomId()`를 쓴다.
+
 ## 번들 측정
 
 상태 facade는 bundle 크기 우선 경로가 아니다. leaf 11개와 crypto 접근 코드를 전부 포함하므로 크기가 중요하면 root leaf를 단독 import한다.

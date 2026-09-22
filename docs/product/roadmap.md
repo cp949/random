@@ -276,6 +276,8 @@ ID 생성기: 무작위 ID (UUID, nanoid, 숫자·문자 ID)와 순환·순차 I
 - 정렬 보존 base62·base32 ID 인코딩, alphabet 상수. 설계 메모: `Uint8Array` big-endian 진법 변환을 직접 구현한다(외부 진법 라이브러리 없음). 패딩은 값이 아니라 표현임을 round-trip 테스트로 고정한다.
 - ULID 등 추가 시간 정렬 ID. 설계 메모: counter 고갈 시 예외가 아니라 timestamp 전진. clock-skew 임계값은 `uuidv7`의 10,000ms 정책을 공통 규칙으로 쓴다. 난수 주입은 `randomBytes: (length) => Uint8Array` 형태로 통일한다.
 - 사용 중인 ID를 건너뛰는 순환 할당기(allocate, release)
+- `uuidv7` timestamp 추출(ulidx `decodeTime` 대응). 설계 메모: 문자열을 받아 앞 48비트를 big-endian 밀리초 정수로 돌려주는 순수 함수다. 형식 검사는 `isUuid(value, { version: 7 })`와 같은 기준이고 위반은 `RangeError`다. 돌려주는 값은 counter 고갈·되돌림 규칙에 따른 논리 시각이라 실제 생성 시각과 다를 수 있음을 문서에 명시한다.
+- `RandomSource` → `randomBytes` 어댑터(재현 가능한 ID. chance.js seeded `guid`, nanoid `customRandom` 대응). 설계 메모: `docs/api/state.md`의 레시피가 먼저다. 반복 wrapper 사례가 확인되면 함수로 승격한다. word→byte 매핑과 소비 순서는 계약이 아니며, 주입 결과에는 보안 보증이 없다(README "확정된 제약").
 - 벤치마크 baseline과 그에 근거한 `options.out` 등 할당 없는 API
   - 실험 후보. 각 후보는 벤치마크로 이득이 확인될 때만 적용한다. 지금은 적용하지 않는다.
   - `uniformInt`: `n`이 2의 거듭제곱일 때 rejection 없이 비트마스크로 뽑는 경로. `int` 결과는 계약이 아니므로 non-breaking이며 CHANGELOG에 기록한다.

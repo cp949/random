@@ -12,6 +12,8 @@
 - 리서치 문서 `docs/research/`(요약 1편, 상세 11편) 추가.
 - `docs/api/secure.md`·`docs/api/id.md`·`docs/api/random-core.md`에 설계 근거(버퍼 비공유, `randomBytes` 주입 형태, 10,000ms 정책, 예측 가능성)와 seed 합성 레시피 추가. 계약 표는 변경 없음.
 - 로드맵 §2에 "breaking change는 한 릴리스에 하나의 축" 원칙, R9 후보 4개에 설계 메모, 벤치마크 실험 후보 3개 추가.
+- 로드맵 R9 후보 2개 추가: `uuidv7` timestamp 추출, `RandomSource` → `randomBytes` 어댑터.
+- `docs/api/state.md`에 재현 가능한 ID 레시피(seed 상태의 `source`를 `./id` 팩토리의 `randomBytes`로 감싸기) 추가.
 
 테스트:
 
