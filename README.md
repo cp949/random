@@ -2,6 +2,36 @@
 
 브라우저용 ID 생성기와 그 토대인 보안·재현 가능 난수 라이브러리 모노레포. 상태: 프로젝트 기반(검증 게이트), 일반 random(root: 재현 가능한 난수 코어·컬렉션 샘플링), 상태 facade(`@cp949/random/state`), 보안 난수(`@cp949/random/secure`), 무작위 ID·UUID·순환·카운터 ID(`@cp949/random/id`) 구현. 0.1.0은 배포 전이다.
 
+## 빠른 예제
+
+```sh
+npm install @cp949/random
+```
+
+```ts
+import { nanoid, randomId, uuidv7 } from "@cp949/random/id";
+
+nanoid(); // URL-safe 무작위 ID, 기본 21자
+randomId({ prefix: "user" }); // "user_" + base64url 무작위 문자열
+uuidv7(); // 시간순으로 정렬되는 UUID
+```
+
+```ts
+import { randomHex, randomInt } from "@cp949/random/secure";
+
+randomInt(1, 6); // [1, 6] 균등 정수
+randomHex(16); // 32자리 hex 토큰
+```
+
+```ts
+import { createXoshiro128Source, int } from "@cp949/random";
+
+const source = createXoshiro128Source("seed-1");
+int(source, 1, 100); // 같은 seed는 항상 같은 값
+```
+
+subpath별 전체 계약은 아래 [공개 API](#공개-api) 표를 따른다.
+
 ## 공개 API
 
 공개 계약(함수별 입력 검증, 오류, 결과값이 계약인지 여부)은 `docs/api/`에 기록한다.
