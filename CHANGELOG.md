@@ -4,7 +4,18 @@
 
 ## Unreleased
 
-없음.
+공개 API 변경 없음.
+
+문서:
+
+- 유사 라이브러리 비교 문서 `docs/comparison.md`(차별점, 옮겨올 때 걸리는 것, 채택하지 않은 패턴). 루트·패키지 README에서 연결.
+- 리서치 문서 `docs/research/`(요약 1편, 상세 11편) 추가.
+- `docs/api/secure.md`·`docs/api/id.md`·`docs/api/random-core.md`에 설계 근거(버퍼 비공유, `randomBytes` 주입 형태, 10,000ms 정책, 예측 가능성)와 seed 합성 레시피 추가. 계약 표는 변경 없음.
+- 로드맵 §2에 "breaking change는 한 릴리스에 하나의 축" 원칙, R9 후보 4개에 설계 메모, 벤치마크 실험 후보 3개 추가.
+
+테스트:
+
+- `int`·`uniform`·샘플링 6개의 non-regression 인라인 스냅샷(`test/core/noreg.test.ts`, `test/sampling/noreg.test.ts`). 결과값은 계약이 아니며 산식 변경 시 갱신한다.
 
 ## [0.1.0] - 2026-09-22
 

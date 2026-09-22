@@ -55,6 +55,7 @@ ID 생성기: 무작위 ID (UUID, nanoid, 숫자·문자 ID)와 순환·순차 I
 - 순환·순차 ID는 예측 가능하며 보안 용도가 아니다. 이름과 문서에서 무작위 ID와 구분한다.
 - 재현성 계약은 기본 PRNG의 raw 출력 스트림, seed→상태 변환, 그 위의 `float`·`bool`·`sign` 산식에 한정한다. 이 계약의 변경은 breaking이다(0.x는 minor 증가, 1.0 이후 major 증가). `int`·`uniform`·샘플링·shuffle의 결과값은 계약이 아니다.
 - 0.x 동안 breaking change를 허용한다.
+- breaking change는 한 릴리스에 하나의 축만 넣는다. 여러 축(예: seed 해시 변경과 시그니처 변경)을 한 릴리스에 모으지 않는다. 근거는 `docs/comparison.md`의 pure-rand 사례다.
 - 성능 주장은 벤치마크 전에는 하지 않는다.
 - 기존 소비자(Geul, Vectra 등)의 migration은 이 로드맵에 포함하지 않는다. 별도 요청이 있을 때만 다룬다.
 
@@ -268,14 +269,18 @@ ID 생성기: 무작위 ID (UUID, nanoid, 숫자·문자 ID)와 순환·순차 I
 
 이 단계의 항목은 수요 증거가 확인되면 개별 단계로 승격한다. 지금은 순서와 완료 조건을 정하지 않는다.
 
-- `RandomState` 상태 스냅샷(`getState`, `setState`, 버전 헤더)
-- 독립 스트림 분기(`fork`, jump)
+- `RandomState` 상태 스냅샷(`getState`, `setState`, 버전 헤더). 설계 메모: `RandomSource`(`() => number`) 계약은 유지한다. 스냅샷은 별도 인터페이스(clone 가능한 source) 또는 "seed + 소비한 word 수" 재생 방식으로 root 계약 밖에서 제공한다. 상태 객체 형태 위반은 `RangeError`다.
+- 독립 스트림 분기(`fork`, jump). 설계 메모: jump는 xoshiro128\*\* 참조 구현의 jump 다항식을 쓴다. `jump` 후 `next`와 `next` 후 `jump`가 같은 상태를 내는 순서 무관성을 속성 테스트로 고정한다.
 - shuffle-bag
 - 추가 PRNG 구현체(sfc32, PCG 등)
-- 정렬 보존 base62·base32 ID 인코딩, alphabet 상수
-- ULID 등 추가 시간 정렬 ID
+- 정렬 보존 base62·base32 ID 인코딩, alphabet 상수. 설계 메모: `Uint8Array` big-endian 진법 변환을 직접 구현한다(외부 진법 라이브러리 없음). 패딩은 값이 아니라 표현임을 round-trip 테스트로 고정한다.
+- ULID 등 추가 시간 정렬 ID. 설계 메모: counter 고갈 시 예외가 아니라 timestamp 전진. clock-skew 임계값은 `uuidv7`의 10,000ms 정책을 공통 규칙으로 쓴다. 난수 주입은 `randomBytes: (length) => Uint8Array` 형태로 통일한다.
 - 사용 중인 ID를 건너뛰는 순환 할당기(allocate, release)
 - 벤치마크 baseline과 그에 근거한 `options.out` 등 할당 없는 API
+  - 실험 후보. 각 후보는 벤치마크로 이득이 확인될 때만 적용한다. 지금은 적용하지 않는다.
+  - `uniformInt`: `n`이 2의 거듭제곱일 때 rejection 없이 비트마스크로 뽑는 경로. `int` 결과는 계약이 아니므로 non-breaking이며 CHANGELOG에 기록한다.
+  - `pickChars`: 첫 요청에 오버슈트 계수를 곱해 `getRandomValues` 호출 횟수를 줄인다(바이트 낭비와 맞바꿈).
+  - `createWordSource`: `createSecureSource` 경로의 버퍼(32바이트) 확대. `randomInt`는 호출마다 새 버퍼라 무관하다.
 
 ## 4. 릴리스 판정
 

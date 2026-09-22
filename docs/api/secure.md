@@ -205,6 +205,8 @@ function createSecureSource(): RandomSource;
 | 결과 값   | 무작위이며 재현할 수 없다(계약이 아니다). 버퍼 크기와 채우는 시점도 계약이 아니다                                                                                          |
 | 보안      | word 자체는 `getRandomValues` 출력이지만, root helper를 거친 결과에 보안 보증을 하지 않는다. token과 ID에는 이 모듈의 함수와 `./id`를 쓴다                                 |
 
+word 버퍼를 호출 간·인스턴스 간 공유하지 않는 이유는 모듈 수준 상태를 두지 않기 위해서다. 상태가 인스턴스 안에만 있어 `getRandomValues`가 실패한 뒤의 복구와 인스턴스 독립성이 보장된다. Node `crypto.randomInt`가 6 KB 공유 캐시를 쓰는 것과 다른 선택이며 성능 비교는 벤치마크 전이다.
+
 ```ts
 import { int } from "@cp949/random";
 import { createSecureSource } from "@cp949/random/secure";

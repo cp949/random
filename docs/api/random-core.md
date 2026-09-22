@@ -91,6 +91,8 @@ seed로 재현 가능한 `RandomSource`를 만든다. 기본 PRNG는 xoshiro128\
 | 인스턴스     | 호출마다 독립된 상태를 가진 새 `RandomSource`를 돌려준다. 인스턴스끼리 상태를 공유하지 않는다                                                                                                                                                                                                     |
 | 결과 값      | 재현 가능하다(계약). 같은 seed는 항상 같은 word 스트림을 낸다                                                                                                                                                                                                                                     |
 
+출력은 예측 가능하다. xoshiro128\*\*는 연속 출력 몇 개로 내부 상태를 복원할 수 있다. token·ID·인증 코드에는 `./secure`와 `./id`를 쓴다.
+
 대표 golden vector. 전체 벡터는 `packages/random/test/core/*.test.ts`에 있으며 raw word는 참조 구현으로 독립 생성한 값이다.
 
 | seed      | word 1       | word 2       | word 3       |
@@ -108,6 +110,12 @@ import { createXoshiro128Source, int } from "@cp949/random";
 
 const source = createXoshiro128Source("game-seed-1");
 const roll = int(source, 1, 6); // 같은 seed·같은 호출 순서면 항상 같은 값
+```
+
+여러 값을 하나의 seed로 합칠 때는 구분자를 넣어 문자열로 join한다. 구분자가 없으면 `"ab" + "c"`와 `"a" + "bc"`가 같은 seed가 된다. 라이브러리는 다중 인자 seed를 받지 않는다(`docs/comparison.md` §3).
+
+```ts
+const source = createXoshiro128Source(`${userId}:${sessionId}:${round}`);
 ```
 
 ## `int(source, min, max)`

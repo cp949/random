@@ -13,6 +13,8 @@
 | `@cp949/random/secure` | 구현 | [`docs/api/secure.md`](docs/api/secure.md)                                                           |
 | `@cp949/random/id`     | 구현 | [`docs/api/id.md`](docs/api/id.md), [사용처별 레시피](docs/guides/id-recipes.md)                     |
 
+유사 라이브러리와의 차이와 옮겨올 때 걸리는 점은 [`docs/comparison.md`](docs/comparison.md)에 있다.
+
 `./id`는 값 export 14개와 타입 export 12개를 제공한다. 무작위 ID·UUID 생성, UUID 형식 변환·검사, 순환·카운터 ID가 구현됐다. 순환·카운터 ID는 예측 가능하며 보안 용도가 아니다. UUID는 인증·인가 수단이 아니며 자원 접근 권한은 별도로 검사해야 한다.
 
 `./state`는 값 export 3개와 타입 export 3개를 제공한다. `rand`는 보안 용도가 아니다.

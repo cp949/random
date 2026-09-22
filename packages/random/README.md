@@ -15,6 +15,7 @@ pnpm add @cp949/random
 - TypeScript 5.7 이상.
 - `exports` 필드만 제공한다. `moduleResolution`이 `Bundler` 또는 `NodeNext`여야 한다. `node10`
   모듈 해석과 webpack 4는 지원하지 않는다.
+- 다른 라이브러리에서 옮겨올 때의 차이(`crypto.randomInt` 상한, `length`와 `byteLength` 등)는 [`docs/comparison.md`](https://github.com/cp949/random/blob/main/docs/comparison.md) 참고.
 
 ## subpath
 
