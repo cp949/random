@@ -1,8 +1,13 @@
+import { fileURLToPath } from "node:url";
 import babelParser from "@babel/eslint-parser";
 import js from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
 import turboPlugin from "eslint-plugin-turbo";
 import onlyWarn from "eslint-plugin-only-warn";
+
+const presetTypescript = fileURLToPath(
+  import.meta.resolve("@babel/preset-typescript"),
+);
 
 /**
  * A shared ESLint configuration for the repository.
@@ -20,7 +25,7 @@ export const config = [
       parserOptions: {
         requireConfigFile: false,
         babelOptions: {
-          presets: ["@babel/preset-typescript"],
+          presets: [presetTypescript],
         },
       },
     },
