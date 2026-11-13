@@ -15,3 +15,9 @@ minimumReleaseAgeExclude:
 peerDependencyRules:
   ignoreMissing:
     - eslint
+# pnpm audit 대응: 부모 패키지가 고정한 취약 전이 의존성을 패치 버전으로 올린다.
+# 모두 개발 도구(stryker, release-it) 경로이며 배포 산출물에 포함되지 않는다.
+overrides:
+  basic-ftp: ^6.2.6
+  qs: ^6.16.1
+  "@stryker-mutator/core>minimatch": ^11.0.1
