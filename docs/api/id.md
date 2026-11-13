@@ -434,7 +434,12 @@ createUuidv7Factory({ now: 0 }); // RangeError
 function createCyclicIdFactory(options: CyclicIdOptions): CyclicIdGenerator;
 
 type CyclicIdPreset =
-  "int8" | "uint8" | "int16" | "uint16" | "int32" | "uint32";
+  | "int8"
+  | "uint8"
+  | "int16"
+  | "uint16"
+  | "int32"
+  | "uint32";
 
 interface CyclicIdOptions {
   preset?: CyclicIdPreset;

@@ -34,15 +34,15 @@ describe("listWorkspacePackages", () => {
 
     expect(packages.map((p) => p.relDir)).toEqual([
       "apps/demo",
-      "packages/eslint-config",
       "packages/legacy-browser-smoke",
+      "packages/oxlint-config",
       "packages/random",
       "packages/typescript-config",
     ]);
     expect(packages.map((p) => p.name)).toEqual([
       "demo",
-      "@repo/eslint-config",
       "@cp949/legacy-browser-smoke",
+      "@repo/oxlint-config",
       "@cp949/random",
       "@repo/typescript-config",
     ]);

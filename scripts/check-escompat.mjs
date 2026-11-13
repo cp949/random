@@ -2,28 +2,32 @@
  * 배포 산출물(dist) 호환성 게이트.
  *
  * 배포 대상 패키지(`packages/*` 중 private가 아닌 것)의 dist JS 전량을 baseline.json의 Chrome 하한(floor) 기준으로
- * 검사한다. ESLint + eslint-plugin-es-x의 `restrict-to-<esTarget>` 프리셋을 깔고, ES2020 이후로 분류되지만 floor에서
- * 이미 지원되는 기능은 `escompat-rules.mjs` 표에서 파생해 푼다. 소스 문법은 tsc가 ES2019로 낮추므로 이 게이트가 실제로
- * 잡는 것은 런타임 API 사용이다. es-x는 ECMAScript 표준만 검사하므로 DOM·Node 전역, `Math.random`, 외부 import는
- * `packages/eslint-config/library.js`의 환경 규칙을 같은 엔진으로 적용한다.
+ * 검사한다. oxlint의 JS 플러그인으로 eslint-plugin-es-x의 `restrict-to-<esTarget>` 프리셋을 깔고, ES2020 이후로
+ * 분류되지만 floor에서 이미 지원되는 기능은 `escompat-rules.mjs` 표에서 파생해 푼다. 소스 문법은 tsc가 ES2019로
+ * 낮추므로 이 게이트가 실제로 잡는 것은 런타임 API 사용이다. es-x는 ECMAScript 표준만 검사하므로 DOM·Node 전역,
+ * `Math.random`, 외부 import는 `packages/oxlint-config/library.js`의 환경 규칙을 같은 엔진으로 적용한다.
+ *
+ * dist 안의 lint 지시 주석(`eslint-disable`, `oxlint-disable` 등)은 게이트를 우회하는 수단이라 주석이 있다는 사실
+ * 자체를 실패로 처리한다(oxlint에는 인라인 지시를 전부 무시하는 옵션이 없다).
  *
  * 검사 대상이 0건이면 게이트가 조용히 무력화되므로 dist가 없거나 JS가 0건이면 실패한다. dist는 빌드 산출물이라
  * `pnpm build` 뒤에 실행한다.
  *
- * 게이트 자신의 검출력은 `scripts/test/check-escompat.test.mjs`가 고정한다. 그래서 대상 파생, ESLint 인스턴스 생성,
+ * 게이트 자신의 검출력은 `scripts/test/check-escompat.test.mjs`가 고정한다. 그래서 대상 파생, oxlint 설정 생성,
  * 게이트 실행을 export하고 직접 실행일 때만 종료 코드를 설정한다.
  */
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { ESLint } from "eslint";
 import esX from "eslint-plugin-es-x";
+import { restrictedSyntaxPlugin } from "../packages/oxlint-config/base.js";
 import {
   capabilitiesRestrictedRules,
   restrictedRules,
-} from "../packages/eslint-config/library.js";
+} from "../packages/oxlint-config/library.js";
 import { loadBaseline } from "./baseline.mjs";
 import { presetName, rulesAllowedAt } from "./escompat-rules.mjs";
+import { runOxlint } from "./oxlint-run.mjs";
 import { listPublishablePackages } from "./workspace-packages.mjs";
 
 /** 이 스크립트가 속한 저장소의 루트. */
@@ -36,12 +40,20 @@ const defaultRepoRoot = fileURLToPath(new URL("..", import.meta.url));
  */
 const COLLISION_PRONE_RULE = /^es-x\/no-(?:iterator|set)-prototype-/;
 
+/** lint 지시 주석. dist에 있으면 게이트 우회 수단이 되므로 실패로 처리한다. */
+const DIRECTIVE_COMMENT = /\b(?:eslint|oxlint|oxc)-(?:disable|enable)\b/;
+
+/** eslint-plugin-es-x 패키지 진입점. oxlint가 JS 플러그인으로 로드하도록 절대 경로로 넘긴다. */
+const esXPluginPath = fileURLToPath(import.meta.resolve("eslint-plugin-es-x"));
+
 /**
- * 게이트가 쓰는 ESLint 인스턴스. 자체 테스트가 같은 구성으로 위반 seed를 lint해 검출력을 고정한다.
+ * 게이트가 쓰는 oxlint 설정(JSON으로 직렬화 가능한 객체). 자체 테스트가 같은 구성으로 위반 seed를 lint해
+ * 검출력을 고정한다.
  *
- * @param {{ repoRoot?: string, baseline?: { chromeFloor: number, esTarget: string } }} [options]
+ * @param {{ baseline?: { chromeFloor: number, esTarget: string }, repoRoot?: string }} [options]
+ * @returns {import("oxlint").OxlintConfig}
  */
-export function createEscompatESLint({
+export function createEscompatConfig({
   repoRoot = defaultRepoRoot,
   baseline = loadBaseline(repoRoot),
 } = {}) {
@@ -57,31 +69,41 @@ export function createEscompatESLint({
       .map((ruleId) => [ruleId, "off"]),
   );
 
-  return new ESLint({
-    cwd: repoRoot,
-    // 저장소의 다른 ESLint 설정을 찾지 않고 아래 baseConfig만 쓴다.
-    overrideConfigFile: true,
-    // dist 안의 eslint-disable 주석이 게이트를 우회하지 못하게 한다.
-    allowInlineConfig: false,
-    baseConfig: [
-      preset,
-      {
-        languageOptions: { ecmaVersion: "latest", sourceType: "module" },
-        // dist JS에는 타입 정보가 없어 기본 모드는 변수 receiver(`values.findLast()`)를 놓친다.
-        // aggressive는 모든 member call을 보고한다.
-        settings: { "es-x": { aggressive: true } },
-        rules: {
-          ...collisionRules,
-          ...rulesAllowedAt(baseline.chromeFloor),
-          ...restrictedRules,
-        },
-      },
+  return {
+    // 저장소의 다른 oxlint 설정은 쓰지 않고 es-x 프리셋과 환경 규칙만 켠다.
+    plugins: ["eslint"],
+    categories: { correctness: "off" },
+    options: { respectEslintDisableDirectives: false },
+    jsPlugins: [esXPluginPath, restrictedSyntaxPlugin],
+    // dist JS에는 타입 정보가 없어 기본 모드는 변수 receiver(`values.findLast()`)를 놓친다.
+    // aggressive는 모든 member call을 보고한다.
+    settings: { "es-x": { aggressive: true } },
+    rules: {
+      ...preset.rules,
+      ...collisionRules,
+      ...rulesAllowedAt(baseline.chromeFloor),
+      ...restrictedRules,
+    },
+    overrides: [
       {
         // getCryptoCapabilities는 환경 진단 전용이라 randomUUID·subtle 참조만 허용한다.
         files: ["**/dist/secure/capabilities.js"],
         rules: capabilitiesRestrictedRules,
       },
     ],
+  };
+}
+
+/**
+ * `cwd` 기준 `targets`를 게이트 설정으로 lint한 진단을 돌려준다. 자체 테스트도 같은 경로를 쓴다.
+ *
+ * @param {{ cwd: string, targets: string[], baseline?: { chromeFloor: number, esTarget: string } }} options
+ */
+export function lintEscompat({ cwd, targets, baseline }) {
+  return runOxlint({
+    cwd,
+    targets,
+    config: createEscompatConfig({ repoRoot: cwd, baseline }),
   });
 }
 
@@ -127,13 +149,22 @@ export async function runEscompatGate(repoRoot = defaultRepoRoot) {
   }
 
   if (files.length > 0) {
-    const eslint = createEscompatESLint({ repoRoot, baseline });
-    for (const result of await eslint.lintFiles(files)) {
-      for (const message of result.messages) {
+    for (const file of files) {
+      if (DIRECTIVE_COMMENT.test(readFileSync(file, "utf8"))) {
         problems.push(
-          `${relative(repoRoot, result.filePath)}:${message.line}:${message.column} ${message.ruleId ?? "parse-error"} ${message.message}`,
+          `${relative(repoRoot, file)}: lint 지시 주석이 있다(dist에서는 게이트 우회 수단이라 허용하지 않는다)`,
         );
       }
+    }
+    const diagnostics = await lintEscompat({
+      cwd: repoRoot,
+      targets: files,
+      baseline,
+    });
+    for (const diagnostic of diagnostics) {
+      problems.push(
+        `${relative(repoRoot, diagnostic.filePath)}:${diagnostic.line}:${diagnostic.column} ${diagnostic.ruleId ?? "parse-error"} ${diagnostic.message}`,
+      );
     }
   }
 

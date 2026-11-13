@@ -6,9 +6,9 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint && pnpm lint:scripts",
-    "lint:scripts": "eslint scripts --max-warnings 0",
-    "format": "prettier --write \"**/*.{ts,tsx,mjs,json,md,yml}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,mjs,json,md,yml}\"",
+    "lint:scripts": "oxlint -c scripts/oxlint.config.js scripts",
+    "format": "oxfmt --write \"**/*.{ts,tsx,mjs,json,md,yml}\"",
+    "format:check": "oxfmt --check \"**/*.{ts,tsx,mjs,json,md,yml}\"",
     "check-types": "turbo run check-types",
     "test": "vitest run",
     "check:no-dom": "node scripts/check-no-dom.mjs",
@@ -32,9 +32,10 @@
     "@stryker-mutator/core": "10.0.0",
     "@stryker-mutator/vitest-runner": "10.0.0",
     "@types/node": "24.13.6",
-    "eslint": "10.11.0",
     "eslint-plugin-es-x": "9.7.0",
-    "prettier": "3.9.8",
+    "oxfmt": "0.78.0",
+    "oxlint": "1.93.0",
+    "oxlint-tsgolint": "7.0.2007",
     "publint": "0.3.24",
     "size-limit": "14.0.0",
     "turbo": "^2.11.2",
@@ -43,8 +44,8 @@
     "vite": "8.3.0",
     "vitest": "5.0.1"
   },
-  "packageManager": "pnpm@11.27.0",
   "engines": {
     "node": ">=24"
-  }
+  },
+  "packageManager": "pnpm@11.27.0"
 }

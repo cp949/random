@@ -1,34 +1,38 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
-import { createEscompatESLint, runEscompatGate } from "../check-escompat.mjs";
+import { afterAll, afterEach, describe, expect, it } from "vitest";
+import { lintEscompat, runEscompatGate } from "../check-escompat.mjs";
+import { loadBaseline } from "../baseline.mjs";
 
-const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
-const eslint = createEscompatESLint();
+const repoBaseline = loadBaseline();
 
-/** 코드를 저장소 기준 `file` 위치의 dist 파일로 보고 lint한 메시지를 돌려준다. */
+/** lint 검사용 임시 저장소 루트. 설정 파일의 `overrides[].files`가 이 루트 기준이라 코드를 같은 상대 경로에 쓴다. */
+const lintRoot = mkdtempSync(join(tmpdir(), "escompat-lint-"));
+
+afterAll(() => {
+  rmSync(lintRoot, { recursive: true, force: true });
+});
+
+/** 코드를 `file` 위치의 dist 파일로 보고 lint한 진단을 돌려준다. */
 async function lint(
   code,
   file = "packages/random/dist/example.js",
-  instance = eslint,
+  baseline = repoBaseline,
 ) {
-  const [result] = await instance.lintText(code, {
-    filePath: join(repoRoot, file),
-  });
-  return result.messages;
+  mkdirSync(dirname(join(lintRoot, file)), { recursive: true });
+  writeFileSync(join(lintRoot, file), code);
+  return lintEscompat({ cwd: lintRoot, targets: [file], baseline });
 }
 
 const rulesOf = (messages) => messages.map((message) => message.ruleId);
 
-/** 파싱 오류(fatal)는 검출로 치지 않는다. */
-const noFatal = (messages) => messages.every((message) => !message.fatal);
+/** 파싱 오류(`ruleId`가 없는 진단)는 검출로 치지 않는다. */
+const noFatal = (messages) => messages.every((message) => message.ruleId);
 
-const atFloor = (chromeFloor) =>
-  createEscompatESLint({ baseline: { chromeFloor, esTarget: "ES2019" } });
+const atFloor = (chromeFloor) => ({ chromeFloor, esTarget: "ES2019" });
 
-describe("createEscompatESLint: 위반 검출", () => {
+describe("lintEscompat: 위반 검출", () => {
   it.each([
     ["[].at(0);", "es-x/no-array-prototype-at", "배열 리터럴 at"],
     [
@@ -54,7 +58,7 @@ describe("createEscompatESLint: 위반 검출", () => {
     ["Math.random();", "no-restricted-properties", "Math.random"],
     [
       "const M = Math; M.random();",
-      "no-restricted-syntax",
+      "repo/no-restricted-syntax",
       "Math를 변수에 담는 우회",
     ],
     ["document.title;", "no-restricted-globals", "document"],
@@ -67,8 +71,12 @@ describe("createEscompatESLint: 위반 검출", () => {
     ],
     ['import "node:fs";', "no-restricted-imports", "node: 내장 모듈"],
     ['import x from "left-pad"; x;', "no-restricted-imports", "외부 패키지"],
-    ['import("left-pad");', "no-restricted-syntax", "외부 패키지 동적 import"],
-    ["import(name);", "no-restricted-syntax", "계산된 동적 import"],
+    [
+      'import("left-pad");',
+      "repo/no-restricted-syntax",
+      "외부 패키지 동적 import",
+    ],
+    ["import(name);", "repo/no-restricted-syntax", "계산된 동적 import"],
   ])("`%s`는 %s로 검출된다(%s)", async (code, ruleId) => {
     const messages = await lint(`${code}\n`);
 
@@ -76,7 +84,7 @@ describe("createEscompatESLint: 위반 검출", () => {
     expect(rulesOf(messages)).toContain(ruleId);
   });
 
-  it("dist 안의 eslint-disable 주석이 게이트를 우회하지 못한다", async () => {
+  it("eslint-disable 주석이 있어도 위반을 검출한다", async () => {
     const blanket = await lint("/* eslint-disable */\n[].at(0);\n");
     const targeted = await lint(
       "// eslint-disable-next-line es-x/no-array-prototype-at\n[].at(0);\n",
@@ -87,7 +95,7 @@ describe("createEscompatESLint: 위반 검출", () => {
   });
 });
 
-describe("createEscompatESLint: 허용", () => {
+describe("lintEscompat: 허용", () => {
   it.each([
     ["BigInt(1);", "BigInt(Chrome 67)"],
     ["globalThis.crypto;", "globalThis(Chrome 71)와 globalThis.crypto 접근"],
@@ -116,7 +124,7 @@ describe("createEscompatESLint: 허용", () => {
   });
 });
 
-describe("createEscompatESLint: capabilities 예외", () => {
+describe("lintEscompat: capabilities 예외", () => {
   const usage = "export const a = c.randomUUID;\nexport const b = c.subtle;\n";
 
   it("dist/secure/capabilities.js에서만 randomUUID·subtle 참조가 허용된다", async () => {
@@ -141,7 +149,7 @@ describe("createEscompatESLint: capabilities 예외", () => {
   });
 });
 
-describe("createEscompatESLint: floor 변경이 허용 규칙에 반영된다", () => {
+describe("lintEscompat: floor 변경이 허용 규칙에 반영된다", () => {
   it("numeric separators는 floor 74에서 실패하고 75에서 통과한다", async () => {
     const code = "export const n = 1_000;\n";
 
@@ -235,6 +243,39 @@ describe("runEscompatGate", () => {
     expect(result.problems.join("\n")).toContain("packages/lib/dist/index.js");
     expect(result.problems.join("\n")).toContain("es-x/no-array-prototype-at");
   });
+
+  it.each([
+    "/* eslint-disable */\nexport const a = [].at(0);\n",
+    "// eslint-disable-next-line es-x/no-array-prototype-at\nexport const a = [].at(0);\n",
+  ])(
+    "dist의 eslint 지시 주석은 위반 검출을 막지 못하고 주석 자체도 실패한다: %s",
+    async (code) => {
+      const root = makeRepo({ ...lib, "packages/lib/dist/index.js": code });
+
+      const result = await runEscompatGate(root);
+
+      expect(result.ok).toBe(false);
+      expect(result.problems.join("\n")).toContain("lint 지시 주석");
+      expect(result.problems.join("\n")).toContain(
+        "es-x/no-array-prototype-at",
+      );
+    },
+  );
+
+  it.each([
+    "/* oxlint-disable */\nexport const a = [].at(0);\n",
+    "// oxlint-disable-next-line es-x/no-array-prototype-at\nexport const a = [].at(0);\n",
+  ])(
+    "dist의 oxlint 지시 주석은 oxlint가 위반을 숨기지만 주석 자체를 실패로 처리한다: %s",
+    async (code) => {
+      const root = makeRepo({ ...lib, "packages/lib/dist/index.js": code });
+
+      const result = await runEscompatGate(root);
+
+      expect(result.ok).toBe(false);
+      expect(result.problems.join("\n")).toContain("lint 지시 주석");
+    },
+  );
 
   it("하위 디렉터리의 .mjs·.cjs 위반도 검출한다", async () => {
     const root = makeRepo({

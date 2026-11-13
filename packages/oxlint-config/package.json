@@ -1,0 +1,17 @@
+{
+  "name": "@repo/oxlint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base": "./base.js",
+    "./browser": "./browser.js",
+    "./library": "./library.js",
+    "./node": "./node.js"
+  },
+  "devDependencies": {
+    "eslint-plugin-turbo": "2.11.2",
+    "oxlint": "1.93.0",
+    "oxlint-tsgolint": "7.0.2007"
+  }
+}

@@ -5,7 +5,11 @@ import { BASE64URL_ALPHABET } from "../internal/encoding.js";
  * `alphabet`(사용자 정의 문자 집합)과 함께 쓸 수 없고, 대소문자 선택(`case`)은 `base36`과 `readable`에만 있다.
  */
 export type RandomIdPreset =
-  "base64url" | "base62" | "base36" | "digits" | "readable";
+  | "base64url"
+  | "base62"
+  | "base36"
+  | "digits"
+  | "readable";
 
 /** preset 이름 전부. 옵션 검증과 오류 메시지가 이 순서를 쓴다. */
 export const RANDOM_ID_PRESETS: readonly RandomIdPreset[] = [

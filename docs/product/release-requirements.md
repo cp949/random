@@ -59,7 +59,7 @@
 - `package.json`: name `@cp949/legacy-browser-smoke`, `private: true`(`listPublishablePackages`가 배포 게이트 대상에서 제외한다), `type: module`, 런타임 의존성 0. devDependencies는 lint 설정과 vitest뿐이다(4.5 fallback 2단계 채택 시에만 `puppeteer-core@1.15.0` 추가).
 - 파일: `Dockerfile`, `src/run.mjs`(runner), `src/serve.mjs`(정적 서버, 컨테이너·로컬 공용), `src/container-entry.mjs`(컨테이너 안에서 서버 기동 → Chromium 실행 → 결과 출력), `page/index.html`, `page/smoke.js`(assertion), `test/*.test.mjs`(runner의 파싱·판정·요약 형식 단위 테스트).
 - 루트 `vitest.config.ts`의 `projects`에 `packages/legacy-browser-smoke`를 추가한다. 컨테이너·브라우저를 띄우는 테스트는 없다(단위 테스트만).
-- lint: `@repo/eslint-config/node`(runner, 서버, entry)와 `@repo/eslint-config/browser`(페이지). 페이지 파일에는 `scripts/escompat-rules.mjs`의 `rulesAllowedAt(chromeFloor)`로 `eslint-plugin-es-x` 규칙을 켠다 — 페이지 자체가 Chrome 75 문법을 넘으면 smoke가 실행되지 않아 결과 없음(FAIL)으로 끝나지만, lint가 원인을 먼저 보여 준다. 최종 판정은 실행이다.
+- lint: `@repo/oxlint-config/node`(runner, 서버, entry)와 브라우저 환경(페이지). 페이지 파일에는 `scripts/escompat-rules.mjs`의 `rulesAllowedAt(chromeFloor)`로 `eslint-plugin-es-x` 규칙을 oxlint JS 플러그인으로 켠다 — 페이지 자체가 Chrome 75 문법을 넘으면 smoke가 실행되지 않아 결과 없음(FAIL)으로 끝나지만, lint가 원인을 먼저 보여 준다. 최종 판정은 실행이다.
 
 ### 3.2 루트 스크립트
 

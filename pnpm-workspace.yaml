@@ -1,15 +1,17 @@
 packages:
   - "apps/*"
   - "packages/*"
+# oxlint JS 플러그인(eslint-plugin-es-x, eslint-plugin-turbo)은 eslint를 peer로 선언하지만
+# oxlint가 로드하므로 eslint를 설치하지 않는다.
+autoInstallPeers: false
 minimumReleaseAgeExclude:
-  - '@typescript-eslint/eslint-plugin@8.70.1'
-  - '@typescript-eslint/parser@8.70.1'
-  - '@typescript-eslint/project-service@8.70.1'
-  - '@typescript-eslint/scope-manager@8.70.1'
-  - '@typescript-eslint/tsconfig-utils@8.70.1'
-  - '@typescript-eslint/type-utils@8.70.1'
-  - '@typescript-eslint/types@8.70.1'
-  - '@typescript-eslint/typescript-estree@8.70.1'
-  - '@typescript-eslint/utils@8.70.1'
-  - '@typescript-eslint/visitor-keys@8.70.1'
-  - typescript-eslint@8.70.1
+  - '@oxlint-tsgolint/darwin-arm64@7.0.2007'
+  - '@oxlint-tsgolint/darwin-x64@7.0.2007'
+  - '@oxlint-tsgolint/linux-arm64@7.0.2007'
+  - '@oxlint-tsgolint/linux-x64@7.0.2007'
+  - '@oxlint-tsgolint/win32-arm64@7.0.2007'
+  - '@oxlint-tsgolint/win32-x64@7.0.2007'
+  - oxlint-tsgolint@7.0.2007
+peerDependencyRules:
+  ignoreMissing:
+    - eslint

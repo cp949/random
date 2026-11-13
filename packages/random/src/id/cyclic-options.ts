@@ -13,7 +13,12 @@ import {
  * 각 정수 타입의 전체 범위이며 시작값은 0이다. `min`·`max`와 함께 쓸 수 없다.
  */
 export type CyclicIdPreset =
-  "int8" | "uint8" | "int16" | "uint16" | "int32" | "uint32";
+  | "int8"
+  | "uint8"
+  | "int16"
+  | "uint16"
+  | "int32"
+  | "uint32";
 
 /** preset 이름 전부. 옵션 검증과 오류 메시지가 이 순서를 쓴다. */
 export const CYCLIC_ID_PRESETS: readonly CyclicIdPreset[] = [

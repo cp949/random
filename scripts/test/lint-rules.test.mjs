@@ -1,51 +1,37 @@
-import { rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { ESLint } from "eslint";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createLibraryConfig } from "../../packages/eslint-config/library.js";
-import { nodeConfig } from "../../packages/eslint-config/node.js";
+import { createLibraryConfig } from "../../packages/oxlint-config/library.js";
+import { createNodeConfig } from "../../packages/oxlint-config/node.js";
+import { runOxlint } from "../oxlint-run.mjs";
 
-const packageDir = fileURLToPath(
-  new URL("../../packages/random", import.meta.url),
-);
-const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
-
-// 규칙이 packages/random 기준 경로(`src/**`, `test/**`)에 적용되는지까지 확인하려고 그 디렉터리를 cwd로 쓴다.
-// tsconfigRootDir도 같은 디렉터리로 맞춘다(실제 eslint.config.js가 넘기는 값과 같다).
-const eslint = new ESLint({
-  cwd: packageDir,
-  overrideConfigFile: true,
-  overrideConfig: createLibraryConfig(packageDir),
-});
-
-// legacy project 모드(parserOptions.project)는 tsconfig의 include가 실제로 디스크에서 찾아낸
-// 파일만 프로그램에 넣는다. lintText는 파일을 쓰지 않으므로 이 두 합성 경로는 tsconfig.json·
-// tsconfig.test.json의 include에 걸리도록 자리표시자로 미리 만들어 둔다(실제 lint 대상 텍스트는
-// lintText의 `code`가 쓰이므로 내용은 무관하다). 진짜 src/test 파일과 이름이 겹치지 않는다.
-const PLACEHOLDER_FILES = ["src/example.ts", "test/example.test.ts"];
+// 규칙이 packages/random 기준 경로(`src/**`, `test/**`)에 적용되는지까지 확인하려고 임시 디렉터리에
+// 같은 상대 경로로 코드를 쓰고 설정 파일도 그 디렉터리에 둔다(`overrides[].files`가 설정 파일 위치 기준이다).
+// 실제 src 파일을 덮어쓰지 않는다. 타입 인식 규칙은 tsconfig가 필요해 끈다.
+let root;
+const libraryConfig = createLibraryConfig({ typeAware: false });
+const nodeConfig = createNodeConfig();
 
 beforeAll(() => {
-  for (const file of PLACEHOLDER_FILES) {
-    writeFileSync(join(packageDir, file), "export {};\n");
-  }
+  root = mkdtempSync(join(tmpdir(), "lint-rules-"));
 });
 
 afterAll(() => {
-  for (const file of PLACEHOLDER_FILES) {
-    rmSync(join(packageDir, file), { force: true });
-  }
+  rmSync(root, { recursive: true, force: true });
 });
 
-/** 코드를 `file`(packages/random 기준 상대 경로) 위치의 파일로 보고 lint한 메시지를 돌려준다. */
-async function lint(code, file = "src/example.ts") {
-  const [result] = await eslint.lintText(code, {
-    filePath: join(packageDir, file),
-  });
-  return result.messages;
+/** 코드를 `file`(패키지 기준 상대 경로) 위치의 파일로 보고 lint한 진단을 돌려준다. */
+async function lintWith(config, code, file) {
+  mkdirSync(dirname(join(root, file)), { recursive: true });
+  writeFileSync(join(root, file), code);
+  return runOxlint({ cwd: root, config, targets: [file] });
 }
 
-/** 오류·경고 구분 없이 발생한 규칙 이름만 모은다(저장소는 onlyWarn으로 모두 경고가 된다). */
+const lint = (code, file = "src/example.ts") =>
+  lintWith(libraryConfig, code, file);
+
+/** 발생한 규칙 ID만 모은다. */
 const rulesOf = (messages) => messages.map((message) => message.ruleId);
 
 describe("libraryConfig: src의 금지 전역", () => {
@@ -103,7 +89,7 @@ describe("libraryConfig: src의 Math.random", () => {
       'const key = "random";\nexport const value = Math[key]();\n',
     );
 
-    expect(rulesOf(messages)).toContain("no-restricted-syntax");
+    expect(rulesOf(messages)).toContain("repo/no-restricted-syntax");
   });
 
   it("Math를 다른 변수에 담으면 no-restricted-syntax로 실패한다", async () => {
@@ -111,7 +97,7 @@ describe("libraryConfig: src의 Math.random", () => {
       "const alias = Math;\nexport const value = alias.random();\n",
     );
 
-    expect(rulesOf(messages)).toContain("no-restricted-syntax");
+    expect(rulesOf(messages)).toContain("repo/no-restricted-syntax");
   });
 
   it("Math에서 random을 구조 분해하면 no-restricted-syntax로 실패한다", async () => {
@@ -119,7 +105,7 @@ describe("libraryConfig: src의 Math.random", () => {
       "const { random } = Math;\nexport const value = random();\n",
     );
 
-    expect(rulesOf(messages)).toContain("no-restricted-syntax");
+    expect(rulesOf(messages)).toContain("repo/no-restricted-syntax");
   });
 
   it("Math를 기존 변수에 재할당해도 no-restricted-syntax로 실패한다", async () => {
@@ -127,7 +113,7 @@ describe("libraryConfig: src의 Math.random", () => {
       "let alias;\nalias = Math;\nexport const value = alias;\n",
     );
 
-    expect(rulesOf(messages)).toContain("no-restricted-syntax");
+    expect(rulesOf(messages)).toContain("repo/no-restricted-syntax");
   });
 
   it("Math의 다른 함수는 허용된다", async () => {
@@ -198,7 +184,7 @@ describe("libraryConfig: src의 import", () => {
   ])("%s → no-restricted-syntax로 실패한다", async (code) => {
     const messages = await lint(`${code}\n`);
 
-    expect(rulesOf(messages)).toContain("no-restricted-syntax");
+    expect(rulesOf(messages)).toContain("repo/no-restricted-syntax");
   });
 
   it("상대 경로 import는 허용된다", async () => {
@@ -249,7 +235,6 @@ describe("libraryConfig: 허용되는 코드", () => {
   });
 
   it("타입 위치에서만 쓰는 import는 no-unused-vars 오탐 없이 허용된다", async () => {
-    // babel 파서는 타입 참조를 스코프 분석에 반영하지 않는다. 미사용 검사는 tsc(noUnusedLocals)가 맡는다.
     const messages = await lint(
       [
         'import type { Item } from "./item.js";',
@@ -266,7 +251,6 @@ describe("libraryConfig: 허용되는 코드", () => {
 
 describe("libraryConfig: test", () => {
   it("JS 테스트 파일에서도 Node 전역을 허용한다", async () => {
-    // TS 파일은 no-undef가 꺼져 있어 Node 전역 허용 설정과 무관하게 통과하므로 JS 파일로 확인한다.
     const messages = await lint(
       [
         "export const cwd = process.cwd();",
@@ -292,21 +276,20 @@ describe("libraryConfig: test", () => {
 
     expect(messages).toEqual([]);
   });
+
+  it("test에서는 Node 전역 사용 제한(no-restricted-globals)이 적용되지 않는다", async () => {
+    const messages = await lint(
+      "export const cwd = process.cwd();\n",
+      "test/example.test.ts",
+    );
+
+    expect(rulesOf(messages)).not.toContain("no-restricted-globals");
+  });
 });
 
 describe("nodeConfig: scripts", () => {
-  const scriptsEslint = new ESLint({
-    cwd: repoRoot,
-    overrideConfigFile: true,
-    overrideConfig: nodeConfig,
-  });
-
-  async function lintScript(code, file = "scripts/example.mjs") {
-    const [result] = await scriptsEslint.lintText(code, {
-      filePath: join(repoRoot, file),
-    });
-    return result.messages;
-  }
+  const lintScript = (code, file = "scripts/example.mjs") =>
+    lintWith(nodeConfig, code, file);
 
   it("Node 전역과 환경변수 읽기를 허용한다(scripts는 turbo 작업이 아니라 환경변수 선언 규칙이 무의미하다)", async () => {
     const messages = await lintScript(

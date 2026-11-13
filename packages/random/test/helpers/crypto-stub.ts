@@ -3,7 +3,11 @@ import { seededBytes } from "./seeded-bytes.js";
 
 /** `globalThis.crypto`의 상태. */
 export type CryptoMode =
-  "present" | "absent" | "empty" | "not-function" | "throwing-accessor";
+  | "present"
+  | "absent"
+  | "empty"
+  | "not-function"
+  | "throwing-accessor";
 
 export interface CryptoStubOptions {
   /** 기본 `"present"`. */

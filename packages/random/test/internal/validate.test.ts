@@ -738,7 +738,7 @@ describe("readRandomBytesOption", () => {
         return new Uint8Array(16);
       },
       // async 자체가 이 테스트 케이스의 대상이라 await 없이도 그대로 둔다.
-      // eslint-disable-next-line @typescript-eslint/require-await
+      // oxlint-disable-next-line typescript/require-await
       async () => new Uint8Array(16),
       class Source {},
       (() => new Uint8Array(16)).bind(null),

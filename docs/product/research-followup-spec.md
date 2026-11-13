@@ -119,7 +119,7 @@ rubber-workflow 작업 하나. 작업 폴더 `_works/20260922-05-research-follow
     2. crypto-random-string `{length}`는 결과 문자 수, `randomHex(byteLength)`·`randomBase64url(byteLength)`는
        바이트 수. `length: 32`인 hex는 `randomHex(16)`.
     3. nanoid `customAlphabet(alphabet, size)()`는 `randomString(alphabet, size)` 또는 `randomId({ alphabet,
-length })`. 본 라이브러리의 `nanoid(length)`는 alphabet 인자가 없다.
+       length })`. 본 라이브러리의 `nanoid(length)`는 alphabet 인자가 없다.
     4. cuid2·seedrandom `{entropy:true}`처럼 CSPRNG 부재 시 자동 폴백하는 라이브러리에서 옮길 때: 본
        라이브러리는 폴백하지 않고 `SecureRandomUnavailableError`를 던진다. `getCryptoCapabilities()`로 먼저
        확인한다.

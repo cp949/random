@@ -51,15 +51,15 @@ subpath별 전체 계약은 아래 [공개 API](#공개-api) 표를 따른다.
 
 ## 구성
 
-| 경로                         | 설명                                                                                      |
-| ---------------------------- | ----------------------------------------------------------------------------------------- |
-| `baseline.json`              | Chrome 하한(`chromeFloor`), ES 타깃(`esTarget`), 실측 Chromium 빌드. 하한의 단일 출처     |
-| `packages/random`            | npm 배포 대상 단일 패키지 `@cp949/random`                                                 |
-| `apps/demo`                  | 라이브러리 데모. Vite, private. 빌드 target은 `baseline.json`에서 읽는다                  |
-| `packages/typescript-config` | 공유 tsconfig. `library.json`(라이브러리: ES2019, DOM·전역 타입 없음), `browser.json`(앱) |
-| `packages/eslint-config`     | 공유 ESLint 설정. `libraryConfig`(라이브러리 소스 제한), `nodeConfig`(`scripts/`)         |
-| `scripts/`                   | 검증 게이트와 그 자체 테스트(`scripts/test/`)                                             |
-| `fixtures/`                  | 게이트용 fixture. `dom-usage`(컴파일에 실패해야 함), `consumer`(tarball 소비 검증 템플릿) |
+| 경로                         | 설명                                                                                          |
+| ---------------------------- | --------------------------------------------------------------------------------------------- |
+| `baseline.json`              | Chrome 하한(`chromeFloor`), ES 타깃(`esTarget`), 실측 Chromium 빌드. 하한의 단일 출처         |
+| `packages/random`            | npm 배포 대상 단일 패키지 `@cp949/random`                                                     |
+| `apps/demo`                  | 라이브러리 데모. Vite, private. 빌드 target은 `baseline.json`에서 읽는다                      |
+| `packages/typescript-config` | 공유 tsconfig. `library.json`(라이브러리: ES2019, DOM·전역 타입 없음), `browser.json`(앱)     |
+| `packages/oxlint-config`     | 공유 oxlint 설정. `createLibraryConfig`(라이브러리 소스 제한), `createNodeConfig`(`scripts/`) |
+| `scripts/`                   | 검증 게이트와 그 자체 테스트(`scripts/test/`)                                                 |
+| `fixtures/`                  | 게이트용 fixture. `dom-usage`(컴파일에 실패해야 함), `consumer`(tarball 소비 검증 템플릿)     |
 
 ## 검증
 
@@ -69,7 +69,7 @@ subpath별 전체 계약은 아래 [공개 API](#공개-api) 표를 따른다.
 | 명령                        | 검사                                                                                                                                                                           |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `pnpm lint`                 | 패키지·앱·`scripts/` lint. 라이브러리 소스의 DOM·Node 전역, `Math.random`, 외부 import 금지                                                                                    |
-| `pnpm format:check`         | prettier                                                                                                                                                                       |
+| `pnpm format:check`         | oxfmt                                                                                                                                                                          |
 | `pnpm build --force`        | turbo 캐시 없이 빌드. `build`는 `dist`를 먼저 지운다                                                                                                                           |
 | `pnpm check:escompat`       | dist가 `baseline.json`의 Chrome 하한에 없는 ES 문법·API와 DOM·Node 전역을 쓰지 않는지                                                                                          |
 | `pnpm check:root-isolation` | subpath마다 값 export 전부를 Vite로 번들해 root 번들에 crypto·ID 표식(`getRandomValues` 등)이 없고 다른 subpath 번들에는 자기 표식이 있는지                                    |

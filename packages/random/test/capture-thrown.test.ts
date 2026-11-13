@@ -20,7 +20,7 @@ describe("captureThrown", () => {
     expect(
       captureThrown(() => {
         // 이 테스트의 목적이 Error가 아닌 값도 그대로 전파되는지 확인하는 것이다.
-        // eslint-disable-next-line @typescript-eslint/only-throw-error
+        // oxlint-disable-next-line typescript/only-throw-error
         throw "문자열";
       }),
     ).toBe("문자열");
