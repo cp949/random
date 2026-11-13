@@ -18,6 +18,6 @@
     "@repo/typescript-config": "workspace:*",
     "oxlint": "1.93.0",
     "typescript": "6.0.3",
-    "vite": "8.3.0"
+    "vite": "8.3.8"
   }
 }

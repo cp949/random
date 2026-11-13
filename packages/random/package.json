@@ -62,7 +62,7 @@
     "@repo/oxlint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "oxlint": "1.93.0",
-    "release-it": "^21.1.0",
+    "release-it": "^21.1.2",
     "typescript": "6.0.3"
   }
 }

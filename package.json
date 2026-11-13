@@ -28,21 +28,21 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
-    "@size-limit/preset-small-lib": "14.0.0",
-    "@stryker-mutator/core": "10.0.0",
-    "@stryker-mutator/vitest-runner": "10.0.0",
+    "@size-limit/preset-small-lib": "14.3.0",
+    "@stryker-mutator/core": "10.1.1",
+    "@stryker-mutator/vitest-runner": "10.1.1",
     "@types/node": "24.13.6",
     "eslint-plugin-es-x": "9.7.0",
     "oxfmt": "0.78.0",
     "oxlint": "1.93.0",
     "oxlint-tsgolint": "7.0.2007",
-    "publint": "0.3.24",
-    "size-limit": "14.0.0",
-    "turbo": "^2.11.2",
+    "publint": "0.3.25",
+    "size-limit": "14.3.0",
+    "turbo": "^2.11.11",
     "typescript": "6.0.3",
     "typescript-5.7": "npm:typescript@5.7.3",
-    "vite": "8.3.0",
-    "vitest": "5.0.1"
+    "vite": "8.3.8",
+    "vitest": "5.1.0"
   },
   "engines": {
     "node": ">=24"
