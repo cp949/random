@@ -1,16 +1,9 @@
 import { fileURLToPath } from "node:url";
 
-/** 이 패키지 기준으로 JS 플러그인 경로를 절대 경로로 푼다(소비 패키지의 의존성 목록과 무관하게 로드되도록). */
-const resolvePlugin = (specifier) =>
-  fileURLToPath(import.meta.resolve(specifier));
-
 /** `no-restricted-syntax` 대체 플러그인(`plugins/restricted-syntax.js`). 규칙 ID는 `repo/no-restricted-syntax`. */
 export const restrictedSyntaxPlugin = fileURLToPath(
   new URL("./plugins/restricted-syntax.js", import.meta.url),
 );
-
-/** `turbo/no-undeclared-env-vars`를 제공하는 eslint-plugin-turbo. oxlint JS 플러그인으로 로드한다. */
-export const turboPlugin = resolvePlugin("eslint-plugin-turbo");
 
 /**
  * typescript-eslint `recommendedTypeChecked`에 해당하는 타입 인식 규칙 중 oxlint가 구현한 것.
@@ -56,15 +49,13 @@ export const typeAwareRules = Object.fromEntries(
  * @returns {import("oxlint").OxlintConfig}
  */
 export const createBaseConfig = ({ typeAware = false } = {}) => ({
-  // 기존 ESLint 구성(js recommended, typescript-eslint recommendedTypeChecked, turbo)과 같은 범위를 유지하려고
+  // 기존 ESLint 구성(js recommended, typescript-eslint recommendedTypeChecked)과 같은 범위를 유지하려고
   // unicorn 플러그인은 켜지 않는다.
   plugins: ["eslint", "typescript", "oxc"],
   categories: { correctness: "error" },
-  jsPlugins: [turboPlugin],
   options: { typeAware, denyWarnings: true },
   rules: {
     "no-undef": "error",
-    "turbo/no-undeclared-env-vars": "error",
     ...(typeAware
       ? {
           ...typeAwareRules,

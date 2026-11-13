@@ -291,7 +291,7 @@ describe("nodeConfig: scripts", () => {
   const lintScript = (code, file = "scripts/example.mjs") =>
     lintWith(nodeConfig, code, file);
 
-  it("Node 전역과 환경변수 읽기를 허용한다(scripts는 turbo 작업이 아니라 환경변수 선언 규칙이 무의미하다)", async () => {
+  it("Node 전역과 환경변수 읽기를 허용한다", async () => {
     const messages = await lintScript(
       "export const path = process.env.PATH;\nexport const cwd = process.cwd();\n",
     );

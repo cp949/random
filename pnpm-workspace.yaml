@@ -1,7 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
-# oxlint JS 플러그인(eslint-plugin-es-x, eslint-plugin-turbo)은 eslint를 peer로 선언하지만
+# oxlint JS 플러그인(eslint-plugin-es-x)은 eslint를 peer로 선언하지만
 # oxlint가 로드하므로 eslint를 설치하지 않는다.
 autoInstallPeers: false
 minimumReleaseAgeExclude:

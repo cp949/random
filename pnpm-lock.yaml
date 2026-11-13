@@ -251,9 +251,6 @@ importers:
 
   packages/oxlint-config:
     devDependencies:
-      eslint-plugin-turbo:
-        specifier: 2.11.2
-        version: 2.11.2(turbo@2.11.2)
       oxlint:
         specifier: 1.93.0
         version: 1.93.0(oxlint-tsgolint@7.0.2007)
@@ -1428,10 +1425,6 @@ packages:
   diff-match-patch@1.0.5:
     resolution: {integrity: sha512-IayShXAgj/QMXgB0IWmKx+rOPuGMhqm5w6jvFxmVenXKIzRqTAAsbBPT3kWQeGANj3jGgvcvv4yK6SxqYmikgw==}
 
-  dotenv@16.0.3:
-    resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
-    engines: {node: '>=12'}
-
   dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
@@ -1489,12 +1482,6 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       eslint: '>=9.29.0'
-
-  eslint-plugin-turbo@2.11.2:
-    resolution: {integrity: sha512-u5gsG7EUn7t+QxXfS0fOCdbwrn3vMeF3BscfjKWk5WIWTWvMLmFDV3Zka9PrkXyNgQqzW1PJE5CPcGNbEFsBFQ==}
-    peerDependencies:
-      eslint: '>6.6.0'
-      turbo: '>2.0.0'
 
   eslint-type-tracer@0.5.2:
     resolution: {integrity: sha512-YiJmgk6OD1suPB4UC3M/PB+oxahf145jQQ5gFXFk9F9Y7puWwnqGYC2BtTB+FoHqdOohImeTt0rNk0lhhECNaQ==}
@@ -3504,8 +3491,6 @@ snapshots:
 
   diff-match-patch@1.0.5: {}
 
-  dotenv@16.0.3: {}
-
   dotenv@17.4.2: {}
 
   dunder-proto@1.0.1:
@@ -3551,11 +3536,6 @@ snapshots:
       '@eslint-community/eslint-utils': 4.10.1
       '@eslint-community/regexpp': 4.12.2
       eslint-type-tracer: 0.5.2
-
-  eslint-plugin-turbo@2.11.2(turbo@2.11.2):
-    dependencies:
-      dotenv: 16.0.3
-      turbo: 2.11.2
 
   eslint-type-tracer@0.5.2:
     dependencies:

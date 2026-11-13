@@ -10,7 +10,6 @@
     "./node": "./node.js"
   },
   "devDependencies": {
-    "eslint-plugin-turbo": "2.11.2",
     "oxlint": "1.93.0",
     "oxlint-tsgolint": "7.0.2007"
   }

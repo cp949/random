@@ -117,7 +117,7 @@ export const createLibraryConfig = ({ typeAware = true } = {}) => {
   const base = createBaseConfig({ typeAware });
   return {
     ...base,
-    jsPlugins: [...base.jsPlugins, restrictedSyntaxPlugin],
+    jsPlugins: [restrictedSyntaxPlugin],
     overrides: [
       {
         files: ["src/**/*.{ts,mts,cts,js,mjs,cjs}"],
