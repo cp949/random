@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@repo/oxlint-config": "workspace:*",
-    "eslint-plugin-es-x": "9.7.0",
+    "eslint-plugin-es-x": "10.1.0",
     "oxlint": "1.93.0"
   }
 }
