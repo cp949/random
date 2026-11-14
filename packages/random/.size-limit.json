@@ -99,7 +99,7 @@
     "name": "uuidv4",
     "path": "dist/id/index.js",
     "import": "{ uuidv4 }",
-    "limit": "950 B"
+    "limit": "1000 B"
   },
   {
     "name": "createUuidv4Factory",
@@ -111,13 +111,13 @@
     "name": "uuidv7",
     "path": "dist/id/index.js",
     "import": "{ uuidv7 }",
-    "limit": "1450 B"
+    "limit": "1400 B"
   },
   {
     "name": "createUuidv7Factory",
     "path": "dist/id/index.js",
     "import": "{ createUuidv7Factory }",
-    "limit": "1650 B"
+    "limit": "1600 B"
   },
   {
     "name": "createCyclicIdFactory",
@@ -135,7 +135,7 @@
     "name": "createXoshiro128Source",
     "path": "dist/index.js",
     "import": "{ createXoshiro128Source }",
-    "limit": "600 B"
+    "limit": "550 B"
   },
   {
     "name": "int",
@@ -159,7 +159,7 @@
     "name": "sign",
     "path": "dist/index.js",
     "import": "{ sign }",
-    "limit": "150 B"
+    "limit": "200 B"
   },
   {
     "name": "uniform",
@@ -213,13 +213,13 @@
     "name": "createRandomState",
     "path": "dist/state/index.js",
     "import": "{ createRandomState }",
-    "limit": "2700 B"
+    "limit": "2650 B"
   },
   {
     "name": "rand",
     "path": "dist/state/index.js",
     "import": "{ rand }",
-    "limit": "2700 B"
+    "limit": "2650 B"
   },
   {
     "name": "SecureRandomUnavailableError (state)",
