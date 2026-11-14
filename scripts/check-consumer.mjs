@@ -47,8 +47,8 @@ const TYPE_CHECKS = [
 
 /**
  * 컴파일러 lane. 저장소의 TypeScript와 소비자 하한 TypeScript다.
- * 하한은 루트 `package.json`의 devDependency alias(`typescript-5.7`)로 고정한다. 하한 값을 바꾸려면 alias와
- * `docs/api/secure.md`의 "TypeScript 5.7 이상"을 함께 고친다.
+ * 하한은 루트 `package.json`의 devDependency alias(`typescript-5.7`)로 고정한다. 하한 값은 여러 문서·fixture에도
+ * 적혀 있어 바꿀 때 함께 고칠 위치는 루트 `README.md`의 "확정된 제약"을 따른다.
  */
 const TS_LANES = [DEFAULT_TYPESCRIPT, "typescript-5.7"];
 

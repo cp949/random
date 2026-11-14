@@ -19,9 +19,9 @@
 
 - `int`·`uniform`·샘플링 6개의 non-regression 인라인 스냅샷(`test/core/noreg.test.ts`, `test/sampling/noreg.test.ts`). 결과값은 계약이 아니며 산식 변경 시 갱신한다.
 
-## [0.1.0] - 2026-09-22
+## [0.1.1] - 2026-09-22
 
-`@cp949/random` 첫 배포.
+`@cp949/random` 첫 배포. 릴리스 게이트(R8)는 0.1.0을 목표로 했으나 npm에는 0.1.1로 배포했고 0.1.0은 npm에 없다.
 
 추가:
 
