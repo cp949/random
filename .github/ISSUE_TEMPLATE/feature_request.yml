@@ -1,0 +1,31 @@
+name: 기능 요청
+description: 새 기능이나 옵션 제안. 실제 사용 사례가 필요하다.
+title: "[기능] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        새 기능은 로드맵의 기능 추가 판정 기준(docs/product/roadmap.md §1) 셋을 모두 통과해야 들어간다. 아래 항목이 그 판정 근거가 된다.
+  - type: textarea
+    id: use-case
+    attributes:
+      label: 사용 사례
+      description: 어떤 프로젝트에서 무엇을 하려는지. 지금 직접 만들거나 감싸 쓰는 코드가 있으면 붙인다.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 제안하는 API
+      description: 함수 시그니처, 사용 예
+      render: ts
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 현재 대안과 부족한 점
+      description: 기존 API나 다른 라이브러리로 해결할 때 무엇이 부족한지
+    validations:
+      required: true
