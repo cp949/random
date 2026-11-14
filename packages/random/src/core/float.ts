@@ -8,7 +8,7 @@ const TWO_POW_53 = 9_007_199_254_740_992;
 
 /**
  * `[0, 1)` 반개구간에서 53-bit 정밀도의 실수를 만든다. `source`를 2회 호출해 첫 word의 상위 27비트와
- * 둘째 word의 상위 26비트를 조합한다(`internal/uniform-int.ts`의 53비트 경로와 같은 조립 방식).
+ * 둘째 word의 상위 26비트를 조합한다.
  *
  * @throws {RangeError} `source`가 함수가 아닐 때.
  */
