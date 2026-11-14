@@ -247,10 +247,10 @@ id();
 
 상태 facade는 bundle 크기 우선 경로가 아니다. leaf 11개와 crypto 접근 코드를 전부 포함하므로 크기가 중요하면 root leaf를 단독 import한다.
 
-값 export 3개를 각각 단독 import한 minified + brotli 크기다. 측정일은 2026-09-22, 도구는 size-limit 14.0.0(`@size-limit/preset-small-lib` 14.0.0)이다. 한도는 다른 API 문서와 같은 공식 `ceil(측정값 × 1.5 / 50) × 50` B로 정했고 `packages/random/.size-limit.json`에 기록한다. 표의 측정값은 현재 빌드의 수치라서 한도를 정한 값과 달라질 수 있다.
+값 export 3개를 각각 단독 import한 minified + brotli 크기다. 측정일은 2026-11-14, 도구는 size-limit 14.3.0(`@size-limit/preset-small-lib` 14.3.0)이다. 한도는 다른 API 문서와 같은 공식 `ceil(측정값 × 1.5 / 50) × 50` B로 정했고 `packages/random/.size-limit.json`에 기록한다. 표의 측정값은 현재 빌드의 수치라서 한도를 정한 값과 달라질 수 있다.
 
 | export                                | 측정값  | 한도    |
 | ------------------------------------- | ------- | ------- |
-| `createRandomState`                   | 1,782 B | 2,700 B |
-| `rand`                                | 1,784 B | 2,700 B |
+| `createRandomState`                   | 1,764 B | 2,650 B |
+| `rand`                                | 1,765 B | 2,650 B |
 | `SecureRandomUnavailableError`(state) | 88 B    | 150 B   |

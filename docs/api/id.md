@@ -730,22 +730,22 @@ function describeInput(value: string): string {
 
 ## 번들 측정
 
-값 export 14개를 각각 단독 import한 minified + brotli 크기다. 측정일은 2026-09-21, 도구는 size-limit 14.0.0(`@size-limit/preset-small-lib` 14.0.0, rolldown 1.2.9)이다. 한도는 각 export를 처음 측정한 값에 `ceil(측정값 × 1.5 / 50) × 50` B를 적용해 정했고 `packages/random/.size-limit.json`에 기록한다. 표의 측정값은 현재 빌드의 수치라서 한도를 정한 값과 다를 수 있다(R2 export 7개는 -10 B~+7 B 달라졌고 모두 한도 안이다). 측정값은 API 결과값 계약이나 전체 앱 번들 크기를 뜻하지 않는다.
+값 export 14개를 각각 단독 import한 minified + brotli 크기다. 측정일은 2026-11-14, 도구는 size-limit 14.3.0(`@size-limit/preset-small-lib` 14.3.0, rolldown 1.3.2)이다. 한도는 이 측정값에 `ceil(측정값 × 1.5 / 50) × 50` B를 적용해 정했고 `packages/random/.size-limit.json`에 기록한다. 측정 도구(exact pin)를 올리면 다시 측정해 표와 한도를 함께 고친다. 측정값은 API 결과값 계약이나 전체 앱 번들 크기를 뜻하지 않는다.
 
 | export                         | 측정값 | 한도   |
 | ------------------------------ | ------ | ------ |
-| `randomId`                     | 2116 B | 3200 B |
-| `createRandomIdFactory`        | 2246 B | 3400 B |
+| `randomId`                     | 2103 B | 3200 B |
+| `createRandomIdFactory`        | 2237 B | 3400 B |
 | `nanoid`                       | 445 B  | 700 B  |
-| `uuidv4`                       | 635 B  | 950 B  |
-| `uuidv7`                       | 938 B  | 1450 B |
-| `createUuidv4Factory`          | 774 B  | 1200 B |
-| `createUuidv7Factory`          | 1062 B | 1650 B |
+| `uuidv4`                       | 659 B  | 1000 B |
+| `uuidv7`                       | 932 B  | 1400 B |
+| `createUuidv4Factory`          | 785 B  | 1200 B |
+| `createUuidv7Factory`          | 1061 B | 1600 B |
 | `createCyclicIdFactory`        | 821 B  | 1250 B |
-| `createCounterIdFactory`       | 943 B  | 1450 B |
+| `createCounterIdFactory`       | 951 B  | 1450 B |
 | `isUuid`                       | 468 B  | 750 B  |
 | `parseUuid`                    | 245 B  | 400 B  |
-| `stringifyUuid`                | 507 B  | 800 B  |
+| `stringifyUuid`                | 517 B  | 800 B  |
 | `IdCollisionError`             | 90 B   | 150 B  |
 | `SecureRandomUnavailableError` | 88 B   | 150 B  |
 

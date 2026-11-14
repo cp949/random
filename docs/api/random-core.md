@@ -244,15 +244,15 @@ const secureRoll = int(createSecureSource(), 1, 6); // 재현 불가, 보안 용
 
 ## 번들 측정
 
-값 export 6개를 각각 단독 import한 minified + brotli 크기다. 측정일은 2026-09-21, 도구는 size-limit 14.0.0(`@size-limit/preset-small-lib` 14.0.0)이다. 한도는 `docs/api/id.md`와 같은 공식 `ceil(측정값 × 1.5 / 50) × 50` B로 정했고 `packages/random/.size-limit.json`에 기록한다. 표의 측정값은 현재 빌드의 수치라서 한도를 정한 값과 달라질 수 있다. 측정값은 API 결과값 계약이나 전체 앱 번들 크기를 뜻하지 않는다. `sign`은 `bool`을 호출하지 않고 직접 판정해 `float`·확률 검증 코드를 끌어오지 않는다.
+값 export 6개를 각각 단독 import한 minified + brotli 크기다. 측정일은 2026-11-14, 도구는 size-limit 14.3.0(`@size-limit/preset-small-lib` 14.3.0)이다. 한도는 `docs/api/id.md`와 같은 공식 `ceil(측정값 × 1.5 / 50) × 50` B로 정했고 `packages/random/.size-limit.json`에 기록한다. 표의 측정값은 현재 빌드의 수치라서 한도를 정한 값과 달라질 수 있다. 측정값은 API 결과값 계약이나 전체 앱 번들 크기를 뜻하지 않는다. `sign`은 `bool`을 호출하지 않고 직접 판정해 `float`·확률 검증 코드를 끌어오지 않는다.
 
 | export                   | 측정값 | 한도  |
 | ------------------------ | ------ | ----- |
-| `createXoshiro128Source` | 348 B  | 600 B |
+| `createXoshiro128Source` | 363 B  | 550 B |
 | `int`                    | 360 B  | 550 B |
-| `uniform`                | 395 B  | 600 B |
+| `uniform`                | 382 B  | 600 B |
 | `bool`                   | 188 B  | 300 B |
-| `sign`                   | 104 B  | 150 B |
+| `sign`                   | 104 B  | 200 B |
 | `float`                  | 103 B  | 200 B |
 
-`./secure`의 `createSecureSource`는 319 B(한도 500 B)다.
+`./secure`의 `createSecureSource`는 306 B(한도 500 B)다.
