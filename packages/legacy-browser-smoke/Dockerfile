@@ -9,7 +9,7 @@ ARG CHROMIUM_SHA256
 RUN test -n "$CHROMIUM_PLATFORM" && test -n "$CHROMIUM_REVISION" && test -n "$CHROMIUM_SHA256"
 
 # deb.debian.org의 bullseye-security pool은 Packages 색인과 실제 파일이 어긋나 있어(파일이
-# 404, 함정: TRP-006 후보) 이미지가 미리 담아 둔 snapshot.debian.org 고정 라인을 쓴다. 색인·pool이
+# 404) 이미지가 미리 담아 둔 snapshot.debian.org 고정 라인을 쓴다. 색인·pool이
 # 같은 스냅샷에서 나와 항상 일치한다(geul docker/chrome83/Dockerfile과 같은 기법).
 RUN sed -i \
     -e 's|^deb http://deb.debian.org|# deb http://deb.debian.org|' \
