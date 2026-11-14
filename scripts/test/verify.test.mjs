@@ -123,3 +123,57 @@ describe(".github/workflows/ci.yml", () => {
     expect(ci).toMatch(/permissions:\s*\n\s+contents:\s*read/);
   });
 });
+
+describe(".github/workflows/release.yml", () => {
+  const release = readFileSync(
+    join(repoRoot, ".github/workflows/release.yml"),
+    "utf8",
+  );
+  const releaseIt = JSON.parse(
+    readFileSync(join(repoRoot, "packages/random/.release-it.json"), "utf8"),
+  );
+  /** 문자열이 처음 나오는 위치. 없으면 실패한다. */
+  const at = (needle) => {
+    const index = release.indexOf(needle);
+    expect(index, `${needle}이 release.yml에 없다`).toBeGreaterThanOrEqual(0);
+    return index;
+  };
+
+  it("v* 태그 push에서만 실행한다", () => {
+    expect(release).toMatch(/on:\s*\n\s+push:\s*\n\s+tags:\s*\[\s*"v\*"\s*\]/);
+    expect(release).not.toMatch(/branches:/);
+  });
+
+  it("OIDC 토큰 요청 권한(id-token: write)과 읽기 권한만 요청한다", () => {
+    expect(release).toMatch(
+      /permissions:\s*\n\s+contents:\s*read\s*\n\s+id-token:\s*write/,
+    );
+  });
+
+  it("npm 토큰 secret을 쓰지 않는다(trusted publishing으로 인증한다)", () => {
+    expect(release).not.toMatch(/secrets\.|NODE_AUTH_TOKEN|NPM_TOKEN/);
+  });
+
+  it("설치, main 포함 확인, 버전 확인, verify, 재빌드, publish 순서로 실행한다", () => {
+    const order = [
+      at("pnpm install --frozen-lockfile"),
+      at("git merge-base --is-ancestor"),
+      at("GITHUB_REF_NAME"),
+      at("pnpm verify"),
+      at("pnpm build --force"),
+      at("npm publish"),
+    ];
+
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+  });
+
+  it("packages/random에서 provenance를 붙여 public으로 publish한다", () => {
+    expect(release).toMatch(
+      /npm publish --provenance --access public\s*\n\s+working-directory:\s*packages\/random/,
+    );
+  });
+
+  it("release-it은 npm publish를 하지 않는다(publish는 이 workflow만 한다)", () => {
+    expect(releaseIt.npm?.publish).toBe(false);
+  });
+});

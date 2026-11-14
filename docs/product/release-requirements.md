@@ -212,21 +212,35 @@ R8 본문은 고치지 않는다. publish 확인 뒤 `**상태:** 완료 (YYYY-M
 
 ## 7. 릴리스 절차
 
-매 릴리스 이 순서로 실행한다. 주체가 "사용자"인 단계는 에이전트가 실행하지 않는다(`main` 작업 금지, publish는 외부 공개·되돌릴 수 없음, `npm login`·OTP는 대화형).
+매 릴리스 이 순서로 실행한다. 주체가 "사용자"인 단계는 에이전트가 실행하지 않는다(`main` 작업 금지, 태그 push는 publish를 일으켜 외부 공개·되돌릴 수 없음).
 
-| #   | 주체     | 단계                                                                                                                                                                                                                                                                                                                   |
-| --- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | 에이전트 | 작업 브랜치에서 `pnpm verify` 통과.                                                                                                                                                                                                                                                                                    |
-| 2   | 에이전트 | `pnpm smoke:legacy-browser`, `pnpm smoke:local-browser` PASS. 요약 줄을 `docs/compatibility.md` 실측 표에 옮긴다.                                                                                                                                                                                                      |
-| 3   | 에이전트 | `npm pack --dry-run`(`packages/random`) 출력에 `LICENSE`, `README.md`, `package.json`, `dist/**`만 있는지 확인.                                                                                                                                                                                                        |
-| 4   | 에이전트 | CHANGELOG `[0.1.0] - <날짜>` 확정. 재그룹화 후 `dev`에 ff 병합(rubber-workflow). 로드맵 R8은 아직 미완료.                                                                                                                                                                                                              |
-| 5   | 사용자   | `dev` → `main` ff 병합, `main` push.                                                                                                                                                                                                                                                                                   |
-| 6   | 사용자   | `main` checkout에서 `! npm login`(현재 `~/.npmrc` 토큰은 401), `! pnpm verify`.                                                                                                                                                                                                                                        |
-| 7   | 에이전트 | `pnpm --filter @cp949/random release --dry-run`(`release-it`) 출력 검토(버전, 태그명, 파일 목록, `access: public`). `--` 구분자를 넣으면 안 된다 — pnpm이 하위 프로세스 argv에 `--`를 리터럴로 남겨 release-it(`node:util.parseArgs`)이 `--dry-run`을 플래그가 아닌 positional로 오인하고 `increment`에 잘못 대입한다. |
-| 8   | 사용자   | `! pnpm --filter @cp949/random release`. `release-it`이 버전 bump·`git commit`·`git tag v<version>`·push·`npm publish`(OTP 프롬프트)를 한 번에 처리한다.                                                                                                                                                               |
-| 9   | 에이전트 | `npm view @cp949/random@0.1.0 version dist.tarball` 확인.                                                                                                                                                                                                                                                              |
-| 10  | 에이전트 | `dev`에 로드맵 `**상태:** 완료 (날짜)` 한 줄 커밋(rubber-workflow 없이 바로). CHANGELOG 날짜가 실제 publish 날짜와 다르면 같은 커밋에서 고친다.                                                                                                                                                                        |
-| 11  | 에이전트 | 마무리: CI publish(OIDC·provenance) 후속을 GitHub Issue 초안으로 제시(사용자 승인 후 `gh issue create`).                                                                                                                                                                                                               |
+npm publish는 `.github/workflows/release.yml`이 `v*` 태그 push에서 trusted publishing(OIDC)으로 한다. npm 토큰과 로컬 `npm login`은 쓰지 않는다. `release-it`은 버전 bump·commit·tag·push만 한다(`.release-it.json`의 `npm.publish: false`). 0.1.1까지는 로컬 `npm publish`로 배포했다.
+
+| #   | 주체     | 단계                                                                                                                                                                                                                                                                                               |
+| --- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | 에이전트 | 작업 브랜치에서 `pnpm verify` 통과.                                                                                                                                                                                                                                                                |
+| 2   | 에이전트 | `pnpm smoke:legacy-browser`, `pnpm smoke:local-browser` PASS. 요약 줄을 `docs/compatibility.md` 실측 표에 옮긴다.                                                                                                                                                                                  |
+| 3   | 에이전트 | `npm pack --dry-run`(`packages/random`) 출력에 `LICENSE`, `README.md`, `package.json`, `dist/**`만 있는지 확인.                                                                                                                                                                                    |
+| 4   | 에이전트 | CHANGELOG `[<version>] - <날짜>` 확정. 재그룹화 후 `dev`에 ff 병합(rubber-workflow).                                                                                                                                                                                                               |
+| 5   | 사용자   | `dev` → `main` ff 병합, `main` push.                                                                                                                                                                                                                                                               |
+| 6   | 에이전트 | `pnpm --filter @cp949/random release <version> --dry-run` 출력 검토(버전, 태그명). `--` 구분자를 넣으면 안 된다. pnpm이 하위 프로세스 argv에 `--`를 리터럴로 남겨 release-it(`node:util.parseArgs`)이 `--dry-run`을 플래그가 아닌 positional로 오인하고 `increment`에 잘못 대입한다.               |
+| 7   | 사용자   | `! pnpm --filter @cp949/random release <version>`. `release-it`이 `package.json` 버전 bump·`git commit`·`git tag v<version>`·push를 한다. `package.json`의 `version`은 직전 배포 버전이어야 한다. release-it은 이 값을 올리므로, 이미 목표 버전이면 다음 버전이 배포된다(0.1.1이 이렇게 배포됐다). |
+| 8   | CI       | 태그 push가 `release.yml`을 실행한다. 태그 커밋이 `main`에 포함되는지, 태그와 `package.json` 버전이 같은지 확인한 뒤 `pnpm verify`, `pnpm build --force`, `npm publish --provenance`를 실행한다. 에이전트는 실행 결과를 `gh run list --workflow release.yml`로 확인한다.                           |
+| 9   | 에이전트 | `npm view @cp949/random@<version> version dist.tarball` 확인. npm 패키지 페이지에 provenance가 표시되는지 확인.                                                                                                                                                                                    |
+| 10  | 에이전트 | `dev`에 로드맵 `**상태:** 완료 (날짜)` 한 줄 커밋(rubber-workflow 없이 바로). CHANGELOG 날짜가 실제 publish 날짜와 다르면 같은 커밋에서 고친다.                                                                                                                                                    |
+
+### trusted publisher 등록(1회, 사용자)
+
+npmjs.com의 `@cp949/random` 패키지 Settings에서 trusted publisher를 GitHub Actions로 추가한다. 값은 대소문자와 확장자까지 정확히 같아야 한다.
+
+| 항목                 | 값            |
+| -------------------- | ------------- |
+| Organization or user | `cp949`       |
+| Repository           | `random`      |
+| Workflow filename    | `release.yml` |
+| Environment name     | 비움          |
+
+첫 CI publish가 성공한 뒤 같은 Settings의 publishing access에서 토큰 publish를 막는다. `release.yml`의 파일명을 바꾸면 등록도 함께 바꾼다.
 
 ## 8. 보장과 검증
 

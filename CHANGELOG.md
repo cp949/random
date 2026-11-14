@@ -19,6 +19,10 @@
 
 - `int`·`uniform`·샘플링 6개의 non-regression 인라인 스냅샷(`test/core/noreg.test.ts`, `test/sampling/noreg.test.ts`). 결과값은 계약이 아니며 산식 변경 시 갱신한다.
 
+릴리스:
+
+- npm publish를 로컬 `release-it`에서 `.github/workflows/release.yml`(`v*` 태그 push, trusted publishing·provenance)로 옮겼다. npm 토큰을 쓰지 않는다. 태그 커밋의 `main` 포함, 태그와 `package.json` 버전 일치, `pnpm verify` 통과를 확인한 뒤에만 publish한다. 절차는 `docs/product/release-requirements.md` 7절.
+
 ## [0.1.1] - 2026-09-22
 
 `@cp949/random` 첫 배포. 릴리스 게이트(R8)는 0.1.0을 목표로 했으나 npm에는 0.1.1로 배포했고 0.1.0은 npm에 없다.
