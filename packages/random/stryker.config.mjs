@@ -42,12 +42,13 @@ export default {
   // 점수 하한. R1의 첫 측정은 대상 파일 전체에서 생존 mutant 0(100%)이었다(timeout도 검출로 센다).
   // 점수가 `break` 아래로 내려가면 `pnpm mutation`이 실패한다. 파일을 추가할 때 동치 mutant 때문에 필요하면 재검토한다.
   thresholds: { high: 100, low: 98, break: 95 },
-  // 주의: mutate 대상 파일을 직접 커버하는 테스트는 `describe` 없이 최상위 `it`으로 쓴다.
-  // 이 러너(Stryker 10.0.0 + vitest 5.0.1)는 mutant를 실행할 때 커버한 테스트 이름을 공백으로 이어 `-t` 패턴을 만드는데,
-  // vitest 5는 `describe > it` 형태의 이름과 대조한다. 그래서 `describe` 안의 테스트는 한 건도 선택되지 않고
-  // mutant가 전부 살아남은 것(mutant당 0개 실행, 점수 0%)으로 보고된다. 분류는 제목 접두어로 한다.
+  // mutate 대상 파일을 직접 커버하는 기존 테스트는 `describe` 없이 최상위 `it`으로 쓰여 있다(TRP-004).
+  // Stryker 10.0.0 + vitest 5.0.1에서는 러너가 테스트 이름을 공백으로 이어 `-t` 패턴을 만들어 `describe > it` 이름과
+  // 맞지 않았고, `describe` 안의 테스트가 선택되지 않아 점수가 0%로 나왔다. vitest-runner 10.1.1부터는 vitest 5 이상에서
+  // ` > `로 이어 패턴을 만들어 `describe` 안의 테스트도 선택된다. 이 동작은 `scripts/test/stryker.test.mjs`가 감시한다.
   // Stryker 코어는 샌드박스에 복사한 tsconfig.json의 경로를 다시 쓰려고 TypeScript JS API
-  // (`ts.parseConfigFileTextToJson`)를 호출하는데, TypeScript 7(네이티브)에는 그 API가 없어 죽는다.
-  // 샌드박스에 없는 경로를 지정하면 이 전처리를 건너뛴다. tsconfig를 쓰는 다른 Stryker 플러그인은 쓰지 않는다.
+  // (`ts.parseConfigFileTextToJson`)를 호출한다. 저장소 TypeScript(현재 6.0.3)에는 이 API가 있지만
+  // TypeScript 7(네이티브)에는 없어 그대로 두면 죽는다. 샌드박스에 없는 경로를 지정해 이 전처리를 건너뛴다.
+  // tsconfig를 쓰는 다른 Stryker 플러그인은 쓰지 않는다.
   tsconfigFile: ".stryker-tsconfig-unused.json",
 };

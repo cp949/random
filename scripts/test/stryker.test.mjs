@@ -24,7 +24,7 @@ afterEach(() => {
 
 /**
  * 저장소 안 `_tmp`에 작은 TS 프로젝트를 만든다. `tsconfig.json`이 있다는 점이 중요하다.
- * Stryker 코어는 tsconfig.json을 만나면 TypeScript JS API로 다시 쓰려 하는데 TS 7에는 그 API가 없다.
+ * Stryker 코어는 tsconfig.json을 만나면 TypeScript JS API로 다시 쓰려 하는데 TS 7(네이티브)에는 그 API가 없다.
  */
 function makeProject({ tests }) {
   mkdirSync(join(repoRoot, "_tmp"), { recursive: true });
@@ -113,6 +113,19 @@ const fullTests = [
   "",
 ].join("\n");
 
+// fullTests와 같은 테스트를 `describe` 한 겹 안에 둔다(TRP-004 회귀 감시용).
+const nestedFullTests = [
+  'import { describe, expect, it } from "vitest";',
+  'import { add, isPositive } from "../src/add.js";',
+  'describe("그룹", () => {',
+  '  it("두 수를 더한다", () => { expect(add(2, 3)).toBe(5); });',
+  '  it("양수를 판정한다", () => { expect(isPositive(1)).toBe(true); });',
+  '  it("0은 양수가 아니다", () => { expect(isPositive(0)).toBe(false); });',
+  '  it("음수는 양수가 아니다", () => { expect(isPositive(-1)).toBe(false); });',
+  "});",
+  "",
+].join("\n");
+
 describe("packages/random의 Stryker 설정", () => {
   it("vitest 러너를 쓰고 mutate 대상을 핵심 파일로 한정한다", () => {
     expect(baseConfig.testRunner).toBe("vitest");
@@ -165,7 +178,7 @@ describe("packages/random의 Stryker 설정", () => {
   });
 });
 
-describe("Stryker + vitest 5 + TypeScript 7 (tsconfig.json이 있는 프로젝트)", () => {
+describe("Stryker + vitest 5 (tsconfig.json이 있는 프로젝트)", () => {
   it("TS 소스에서 mutant를 만들어 죽이고, 테스트가 약한 판정은 살려 두며 점수 하한을 지키지 못하면 실패한다", () => {
     const dir = makeProject({ tests: partialTests });
 
@@ -190,6 +203,21 @@ describe("Stryker + vitest 5 + TypeScript 7 (tsconfig.json이 있는 프로젝�
     const result = runStryker(dir);
 
     expect(result.status, result.output).toBe(0);
+    expect(
+      result.mutants.filter((mutant) => mutant.status === "Survived"),
+    ).toEqual([]);
+  }, 180_000);
+
+  it("describe 안의 테스트도 mutant 실행 때 선택되어 mutant를 죽인다", () => {
+    const dir = makeProject({ tests: nestedFullTests });
+
+    const result = runStryker(dir);
+
+    // 러너가 describe 안의 테스트를 고르지 못하면 mutant가 전부 살아남고 하한 위반으로 실패한다(TRP-004).
+    expect(result.status, result.output).toBe(0);
+    expect(
+      result.mutants.filter((mutant) => mutant.status === "Killed").length,
+    ).toBeGreaterThan(0);
     expect(
       result.mutants.filter((mutant) => mutant.status === "Survived"),
     ).toEqual([]);

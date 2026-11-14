@@ -1,6 +1,6 @@
 # TRP-004 Stryker가 `describe` 안의 테스트를 실행하지 않아 mutation 점수가 0%로 나온다
 
-- 상태: ACTIVE
+- 상태: RESOLVED (2026-11-14, `@stryker-mutator/vitest-runner` 10.1.1 + vitest 5.1.0에서 해소 확인)
 - 적용 조건: Stryker 10.0.0(`@stryker-mutator/vitest-runner` 10.0.0)과 vitest 5.0.1에서 mutation 대상 파일(`packages/random/stryker.config.mjs`의 `mutate`)을 커버하는 테스트가 `describe` 블록 안에 있을 때. `describe` 한 겹이면 충분하고 이름의 공백·특수문자와 무관하다. Stryker나 vitest를 올릴 때도 같은 조건을 다시 확인한다.
 
 ## 오해하기 쉬운 신호
@@ -14,11 +14,18 @@
 - Stryker 러너는 커버한 테스트 이름을 공백으로 이어 `testNamePattern` 정규식을 만든다(`vitest-test-runner.js`의 `run`).
 - vitest 5.0.1의 `-t`는 `describe` 이름을 `>`로 이은 전체 이름(`그룹 > 제목`)과 대조한다. 공백으로 이은 패턴은 `describe` 안의 테스트와 일치하지 않는다. 최상위 `it`은 이름이 같아 일치한다.
 - 프로브로 확인했다. `-t "그룹 제목"`은 0건, `-t "그룹 > 제목"`은 1건이 선택된다. 테스트가 평면인 프로젝트, 하위 폴더, 특수문자 제목, 테스트 25개는 정상 동작했고 `describe` 한 겹과 두 겹은 0건이었다.
-- 두 패키지 모두 이 시점의 최신 버전(`@stryker-mutator/vitest-runner` 10.0.0)이라 상위 버전으로 해소되지 않는다.
+- 두 패키지 모두 이 시점의 최신 버전(`@stryker-mutator/vitest-runner` 10.0.0)이라 상위 버전으로 해소되지 않았다.
+
+## 해소
+
+- `@stryker-mutator/vitest-runner` 10.1.1은 vitest 버전이 5.0.0 이상이면 테스트 이름을 `>`로 이어 패턴을 만든다(`vitest-test-runner.js`의 `#testNameSeparator`).
+- Stryker 10.1.1 + vitest 5.1.0에서 프로브로 확인했다. `describe` 한 겹 안의 테스트 3개로 mutant 5개가 모두 죽었고 "Ran 1.40 tests per mutant on average", 점수 100%였다.
+- `scripts/test/stryker.test.mjs`의 `describe` 안 테스트 사례가 이 동작을 감시한다. 러너를 내리거나 vitest가 이름 형식을 바꾸면 이 테스트가 실패한다.
+- 기존 테스트 파일의 최상위 `it` 구성과 머리말은 그대로 둔다.
 
 ## 탐지/회피
 
 - 탐지: 실행 결과의 "Ran N tests per mutant"가 0.00이면 러너가 테스트를 고르지 못한 것이다.
-- 회피: mutation 대상 파일을 직접 커버하는 핵심 테스트는 `describe` 없이 최상위 `it`으로 쓰고 그룹은 제목 접두어로 표현한다. `packages/random/stryker.config.mjs` 주석과 해당 테스트 파일의 머리말에 같은 규칙을 적어 두었다.
-- 점수 하한(`break`)이 실제로 동작하는지는 `scripts/test/stryker.test.mjs`가 확인한다.
+- 회피(해당 버전에서): mutation 대상 파일을 직접 커버하는 핵심 테스트는 `describe` 없이 최상위 `it`으로 쓰고 그룹은 제목 접두어로 표현한다. `packages/random/stryker.config.mjs` 주석과 해당 테스트 파일의 머리말에 같은 규칙을 적어 두었다.
+- 점수 하한(`break`)이 실제로 동작하는지와 `describe` 안의 테스트가 선택되는지는 `scripts/test/stryker.test.mjs`가 확인한다.
 - `--logLevel debug`는 Stryker 10.0.0에서 순환 참조 직렬화 오류로 죽고 임시 디렉터리를 남긴다. 이 원인을 조사할 때 쓰지 않는다.
