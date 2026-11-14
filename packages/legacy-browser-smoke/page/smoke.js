@@ -1,5 +1,6 @@
 /**
- * smoke 페이지의 assertion(spec 4.3 A1~A13). Chrome 75 문법·API만 쓴다(금지: `?.`, `??`,
+ * smoke 페이지의 assertion(spec 4.3 A1~A13)과 Worker assertion(W1~W5, `worker/worker-entry.js`를
+ * 번들한 `/worker.js`가 Worker 안에서 실행한다). Chrome 75 문법·API만 쓴다(금지: `?.`, `??`,
  * top-level await, `Promise.allSettled`, `String.prototype.replaceAll`, `Array.prototype.at`).
  * `--dump-dom`은 innerHTML을 이스케이프해 직렬화하므로 결과는 `encodeURIComponent`로 감싼다.
  */
@@ -12,6 +13,9 @@
     { key: "./id", path: "/pkg/dist/id/index.js" },
     { key: "./state", path: "/pkg/dist/state/index.js" },
   ];
+
+  /** Worker 응답을 기다리는 상한(ms). 실제 시간이다(runner가 CDP로 제목을 기다린다). */
+  var WORKER_TIMEOUT_MS = 10000;
 
   /** query 문자열을 읽는다. */
   function readQuery() {
@@ -75,8 +79,13 @@
     return true;
   }
 
-  /** 13개 assertion을 순서대로 실행해 결과 배열을 만든다. */
-  function runAssertions(query, expectedExports, modulesByKey, loadErrorsByKey) {
+  /** 13개 assertion을 순서대로 실행해 결과 배열을 돌려준다. */
+  function runAssertions(
+    query,
+    expectedExports,
+    modulesByKey,
+    loadErrorsByKey,
+  ) {
     var root = modulesByKey["."];
     var secure = modulesByKey["./secure"];
     var idModule = modulesByKey["./id"];
@@ -206,7 +215,10 @@
         return {
           ok: ok,
           detail:
-            "seed42=" + words42.join(",") + " seedHello=" + wordsHello.join(","),
+            "seed42=" +
+            words42.join(",") +
+            " seedHello=" +
+            wordsHello.join(","),
         };
       }),
     );
@@ -322,6 +334,11 @@
       }),
     );
 
+    return assertions;
+  }
+
+  /** 결과 배열을 판정과 함께 `#result`에 쓴다. */
+  function finish(assertions) {
     var ok = true;
     for (var k = 0; k < assertions.length; k += 1) {
       if (!assertions[k].ok) ok = false;
@@ -330,6 +347,55 @@
       userAgent: navigator.userAgent,
       assertions: assertions,
       ok: ok,
+    });
+  }
+
+  /**
+   * `/worker.js`를 classic Worker로 띄워 Worker 안의 assertion 결과를 받는다. 생성·로딩 실패, 형식이 틀린
+   * 메시지, 응답 없음(`WORKER_TIMEOUT_MS`)은 모두 실패 assertion(W0)으로 접는다.
+   */
+  function runWorkerAssertions() {
+    return new Promise(function (resolve) {
+      var settled = false;
+      var worker = null;
+      var timer = null;
+
+      function settle(assertions) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (worker) worker.terminate();
+        resolve(assertions);
+      }
+      function fail(detail) {
+        settle([{ id: "W0", ok: false, detail: detail }]);
+      }
+
+      timer = setTimeout(function () {
+        fail("Worker가 " + WORKER_TIMEOUT_MS + "ms 안에 결과를 보내지 않았다");
+      }, WORKER_TIMEOUT_MS);
+
+      try {
+        worker = new Worker("/worker.js");
+      } catch (error) {
+        fail("Worker를 만들지 못했다: " + String(error));
+        return;
+      }
+      worker.onmessage = function (event) {
+        var data = event.data;
+        if (
+          data &&
+          Array.isArray(data.assertions) &&
+          data.assertions.length > 0
+        ) {
+          settle(data.assertions);
+        } else {
+          fail("Worker 메시지 형식이 틀렸다");
+        }
+      };
+      worker.onerror = function (event) {
+        fail("Worker 오류: " + (event.message || "원인 불명"));
+      };
     });
   }
 
@@ -352,7 +418,15 @@
               modulesByKey[item.key] = item.mod;
             }
           }
-          runAssertions(query, expectedExports, modulesByKey, loadErrorsByKey);
+          var assertions = runAssertions(
+            query,
+            expectedExports,
+            modulesByKey,
+            loadErrorsByKey,
+          );
+          return runWorkerAssertions().then(function (workerAssertions) {
+            finish(assertions.concat(workerAssertions));
+          });
         });
       })
       .catch(function (error) {

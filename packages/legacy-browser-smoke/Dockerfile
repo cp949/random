@@ -51,6 +51,6 @@ RUN curl -fsSL -o /tmp/chrome-linux.zip \
 
 ENV SMOKE_CHROME=/opt/chromium/chrome-linux/chrome
 
-COPY src/serve.mjs src/container-entry.mjs src/chrome-flags.mjs src/spawn-async.mjs /smoke/src/
+COPY src/serve.mjs src/container-entry.mjs src/chrome-flags.mjs src/cdp-result.mjs /smoke/src/
 
 ENTRYPOINT ["node", "/smoke/src/container-entry.mjs"]

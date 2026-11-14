@@ -23,8 +23,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { loadBaseline } from "../../../scripts/baseline.mjs";
 import { packPackage } from "../../../scripts/pack.mjs";
 import { buildChromeArgs } from "./chrome-flags.mjs";
-import { runProcess } from "./spawn-async.mjs";
+import { formatResultElement, runChromeForResult } from "./cdp-result.mjs";
 import { startServer } from "./serve.mjs";
+import { buildWorkerBundle } from "./worker-bundle.mjs";
 
 /** 이 스크립트가 속한 저장소의 루트. */
 const defaultRepoRoot = fileURLToPath(new URL("../../../", import.meta.url));
@@ -104,7 +105,7 @@ export async function buildExpectedExports(pkgDir, manifest) {
 }
 
 /**
- * `--dump-dom` 출력에서 `<pre id="result">`의 텍스트를 꺼내 JSON으로 파싱한다. 요소가 없거나
+ * 실행기가 내보낸 `<pre id="result">`의 텍스트를 꺼내 JSON으로 파싱한다. 요소가 없거나
  * 디코딩·파싱에 실패하면 `null`(결과 없음 = 실패, fail-closed).
  *
  * @param {string} domText
@@ -236,15 +237,18 @@ async function runLocal({ packageDir, pageDir, chromeBinary }) {
       expectChromeVersion: version,
     });
     const url = `http://127.0.0.1:${server.port}/?${params.toString()}`;
-    // 이 프로세스가 띄운 서버에 chrome이 접속하므로 spawnSync(이벤트 루프를 막는다)를 쓰면
-    // chrome의 요청을 서버가 처리하지 못해 멈춘다 — spawn-async.mjs 헤더 설명 참고.
-    const result = await runProcess(
+    // 이 프로세스가 띄운 서버에 chrome이 접속하므로 이벤트 루프를 막는 spawnSync를 쓰지 않는다.
+    const result = await runChromeForResult({
       chromeBinary,
-      buildChromeArgs({ url, userDataDir }),
-      { timeout: PROCESS_TIMEOUT_MS },
-    );
+      args: buildChromeArgs({ url, userDataDir }),
+      timeoutMs: PROCESS_TIMEOUT_MS,
+    });
     if (result.stderr) process.stderr.write(result.stderr);
-    return { stdout: result.stdout ?? "", chrome: version, platform: "host" };
+    return {
+      stdout: result.text ? formatResultElement(result.text) : "",
+      chrome: version,
+      platform: "host",
+    };
   } finally {
     await server.close();
     rmSync(userDataDir, { recursive: true, force: true });
@@ -292,6 +296,13 @@ async function main() {
   );
 
   const baseline = loadBaseline(repoRoot);
+  // Worker assertion용 classic 스크립트. 페이지가 `/worker.js`로 띄운다.
+  await buildWorkerBundle({
+    packageDir,
+    manifest,
+    esTarget: baseline.esTarget,
+    outDir: pageDir,
+  });
   const run =
     target === "container"
       ? runContainer({ repoRoot, packageDir, pageDir, baseline })
@@ -321,7 +332,9 @@ async function main() {
     }),
   );
   if (!result) {
-    console.error('결과 요소(<pre id="result">)를 찾지 못했다');
+    console.error(
+      "결과를 받지 못했다(Chrome 시작·CDP 연결·페이지 판정 중 하나가 시간 안에 끝나지 않았다)",
+    );
   } else if (!ok) {
     for (const assertion of result.assertions) {
       if (!assertion.ok) console.error(`${assertion.id}: ${assertion.detail}`);

@@ -19,6 +19,11 @@
 
 - `int`·`uniform`·샘플링 6개의 non-regression 인라인 스냅샷(`test/core/noreg.test.ts`, `test/sampling/noreg.test.ts`). 결과값은 계약이 아니며 산식 변경 시 갱신한다.
 
+검증:
+
+- Chromium 75 smoke에 Worker assertion 5개(W1~W5)를 추가했다. classic Worker에서 `./secure`·`./id`·`./state`와 seed 42 golden vector를 실행한다. module Worker와 현재 Chrome의 Worker는 실측하지 않았다.
+- smoke의 결과 회수를 `--dump-dom` + `--virtual-time-budget`에서 raw CDP로 바꿨다. 이전 방식은 같은 빌드를 12회 실행하면 6회가 결과 없이 끝났다(FAIL로 판정되어 거짓 통과는 없었다). 바뀐 방식은 8회 모두 결과를 받았다. 절차는 `docs/product/release-requirements.md` 4.5.
+
 릴리스:
 
 - npm publish를 로컬 `release-it`에서 `.github/workflows/release.yml`(`v*` 태그 push, trusted publishing·provenance)로 옮겼다. npm 토큰을 쓰지 않는다. 태그 커밋의 `main` 포함, 태그와 `package.json` 버전 일치, `pnpm verify` 통과를 확인한 뒤에만 publish한다. 절차는 `docs/product/release-requirements.md` 7절.

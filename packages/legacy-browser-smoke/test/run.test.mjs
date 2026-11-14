@@ -1,6 +1,6 @@
 /**
  * runner(`src/run.mjs`)가 export하는 순수 함수 테스트. 인자 파싱, chrome 버전 문자열 파싱,
- * exports 타입 맵 구성, `--dump-dom` 출력에서 결과 회수, 판정, 요약 줄 형식을 다룬다.
+ * exports 타입 맵 구성, 실행기 출력에서 결과 회수, 판정, 요약 줄 형식을 다룬다.
  * 컨테이너·브라우저를 띄우는 테스트는 없다(단위 테스트만, spec 3.1).
  */
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
